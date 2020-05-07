@@ -17,12 +17,8 @@ SDU Semesterproject 4 Group 1
 #include "FreeRTOS.h"   // IMPORTANT!!! Always include FreeRTOS.h before task.h or queue.h etc.
 #include "task.h"
 
-// SPI protocol setup and functions.
-#include "spi_config.h"
-
 // Tasks
 #include "tasktest.h" // (An example of a setup of a task, use this for reference)
-#include "spiTask.h"
 
 // Display Color (For Debugging Purposes)
 #include "display_color.h"
@@ -56,7 +52,6 @@ static void setupHardware(void)
   init_systick();       // Initialize Real time clock SystickTimer for Ticks
   init_gpio();          // Initialize GPIO pins for on board LEDs,
                         // Button Matrix and LCD.
-  init_master_spi();    // Initialize the spi protocol
 }
 
 
@@ -74,7 +69,6 @@ int main(void)
   // Start the tasks.
   // ----------------
   xTaskCreate(myTaskTest, "taskTest", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &myTaskTestHandle);
-  xTaskCreate(spiTask, "spiTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &spiTaskHandle);
 
 
   // Start the scheduler.
