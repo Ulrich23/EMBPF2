@@ -2,61 +2,54 @@
 * University of Southern Denmark
 * Embedded C Programming (ECP)
 *
-* MODULENAME.: display_color.h(.h)
+* MODULENAME.: leds.h
 *
-* PROJECT....: EMBPF2
+* PROJECT....: ECP
 *
-* DESCRIPTION: -
+* DESCRIPTION: Test.
 *
 * Change Log:
 ******************************************************************************
 * Date    Id    Change
-* 8. maj 2020
+* YYMMDD
 * --------------------
-* 090215  MoH   Module created.
+* 050128  KA    Module created.
 *
 *****************************************************************************/
 
-#ifndef FILES_DISPLAY_COLOR_H_
-#define FILES_DISPLAY_COLOR_H_
+#ifndef _LCD_H
+  #define _LCD_H
 
 /***************************** Include files *******************************/
-#include <stdint.h>
-#include "tm4c123gh6pm.h"
-#include "emp_type.h"
-
-
+// FreeRTOS include files
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queueHandlers.h"
 /*****************************    Defines    *******************************/
-#define OFF		0
-#define RED		2
-#define BLUE	4
-#define MAGENTA 6
-#define GREEN	8
-#define YELLOW	10
-#define CYAN	12
-#define WHITE	14
+// Special ASCII characters
+// ------------------------
 
-#define RED_EMP			12
-#define YELLOW_EMP		10
-#define REDYELLOW_EMP	8
-#define GREEN_EMP		6
-#define OFF_EMP			14
+#define LF		0x0A
+#define FF		0x0C
+#define CR		0x0D
+
+#define ESC		0x1B
+
 
 /*****************************   Constants   *******************************/
 
 /*****************************   Functions   *******************************/
+void wr_str_LCD( INT8U* );
+void move_LCD( INT8U, INT8U );
+INT8U wr_ch_LCD( INT8U Ch );
 
-
-
-void display_color(INT16S color);
+void lcd_task(void*);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
-*   Function : -
+*   Function : Test function
 ******************************************************************************/
 
 
 /****************************** End Of Module *******************************/
-
-
-#endif /* FILES_DISPLAY_COLOR_H_ */
+#endif

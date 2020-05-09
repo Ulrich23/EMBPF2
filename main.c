@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-SDU Semesterproject 4 Group 1
+SDU Portfolio 2 Embedded Programming
 
 *****************************************************************************/
 
@@ -16,9 +16,16 @@ SDU Semesterproject 4 Group 1
 // FreeRTOS include files
 #include "FreeRTOS.h"   // IMPORTANT!!! Always include FreeRTOS.h before task.h or queue.h etc.
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 // Tasks
 #include "tasktest.h" // (An example of a setup of a task, use this for reference)
+#include "lcd.h"
+#include "ui.h"
+#include "key.h"
+#include "clockTask.h"
+
 
 // Display Color (For Debugging Purposes)
 #include "display_color.h"
@@ -28,6 +35,11 @@ SDU Semesterproject 4 Group 1
 
 // Others
 #include "taskHandlers.h"
+#include "queueHandlers.h"
+#include "semaphoreHandlers.h"
+#include "file.h"
+#include "storage.h"
+
 
 /*****************************    Defines    *******************************/
 //#define USERTASK_STACK_SIZE configMINIMAL_STACK_SIZE
@@ -52,6 +64,7 @@ static void setupHardware(void)
   init_systick();       // Initialize Real time clock SystickTimer for Ticks
   init_gpio();          // Initialize GPIO pins for on board LEDs,
                         // Button Matrix and LCD.
+  init_files();
 }
 
 
@@ -66,11 +79,25 @@ int main(void)
 
   setupHardware();
 
+  // Create the queues
+  // ----------------
+
+  Q_KEY = xQueueCreate(QUEUE_SIZE, sizeof(INT8U));
+  Q_LCD = xQueueCreate(QUEUE_SIZE, sizeof(INT8U));
+  Q_CLOCK = xQueueCreate( 1 , sizeof( struct time_day * ) );
+  Q_PURCHASE = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof( struct purchase_log * ));
+
+  // Create the semaphore
+  // ----------------
+
+
+
   // Start the tasks.
   // ----------------
   xTaskCreate(myTaskTest, "taskTest", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &myTaskTestHandle);
-
-
+  xTaskCreate(lcd_task, "lcdTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdTaskHandle);
+  xTaskCreate(key_task, "keyTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &keyTaskHandle);
+  xTaskCreate(clock_task, "clockTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &clockTaskHandle);
   // Start the scheduler.
   // --------------------
   vTaskStartScheduler();
