@@ -4,6 +4,9 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+SemaphoreHandle_t SEM_PURCHASE_QUEUE;
+SemaphoreHandle_t SEM_KEY_QUEUE;
+
 
 
 /*****************************    Defines    *******************************/

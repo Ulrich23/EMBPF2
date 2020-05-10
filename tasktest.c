@@ -13,5 +13,6 @@ void myTaskTest (void *p) // Blinks multicolour on-board LED Green and Red switc
         display_color(RED);
         //vTaskDelay(pdMS_TO_TICKS ( 1000 ) );
         vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1000 ) );
+
     }
 }

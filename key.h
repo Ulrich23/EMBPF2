@@ -24,6 +24,10 @@
 // FreeRTOS include files
   #include "FreeRTOS.h"
   #include "task.h"
+  #include "semphr.h"
+  #include "semaphoreHandlers.h"
+  #include "queueHandlers.h"
+
 /*****************************   Constants   *******************************/
 /*****************************   Functions   *******************************/
 BOOLEAN get_keyboard( INT8U* );

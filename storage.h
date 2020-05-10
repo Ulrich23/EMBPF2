@@ -26,6 +26,18 @@
 #include "emp_type.h"
 
 /*****************************    Defines    *******************************/
+enum purchaseStates
+{
+  CHOOSE_PAYMENT,
+  CARD_PAYMENT,
+  CARD_ACCEPTED,
+  CASH_PAYMENT,
+  CHOOSE_GAS,
+  PUMPING,
+  REFUELING_DONE,
+  LOGGED
+};
+
 enum paymentMethod
 {
   S_CASH,
@@ -53,6 +65,7 @@ struct purchase_log {
   INT16U   operating_time;
   INT16U   total_price;
   enum paymentMethod card_or_cash;    //1 for card, 0 for cash
+  enum purchaseStates p_state;
 };
 
 

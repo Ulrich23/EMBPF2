@@ -28,6 +28,8 @@
 // FreeRTOS include files
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 // Include Task Handlers for each task for task communication
 #include "taskHandlers.h"
