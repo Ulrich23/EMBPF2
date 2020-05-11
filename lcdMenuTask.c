@@ -54,7 +54,7 @@ void lcd_Menu_Task(void* p)
   while(1)
   {
      ResponseQueue = uxQueueSpacesAvailable( Q_PURCHASE );
-     if(ResponseQueue == 0)
+     if(ResponseQueue == 0) // There can't be any more purchases today, (exeeded 288)
      {
        gfprintf( COM2, "%c%cToo Many        ", 0x1B, 0x80);
        gfprintf( COM2, "%c%cPurchases today ", 0x1B, 0xC0);
@@ -143,10 +143,10 @@ void lcd_Menu_Display_Task(void *p)
 
         break;
       case CARD_ACCEPTED:
-        gfprintf( COM2, "%c%cQueue Number:   ", 0x1B, 0x80);
-        gfprintf( COM2, "%c%c%c    ", 0x1B, 0xC0, 48 + uxQueueSpacesAvailable( Q_PURCHASE )); //uxQueueSpacesAvailable( Q_PURCHASE )
-        //gfprintf( COM2, "%c%cEnter PIN-code  ", 0x1B, 0x80);
-        //gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
+        //gfprintf( COM2, "%c%cQueue Number:   ", 0x1B, 0x80);
+        //gfprintf( COM2, "%c%c%c    ", 0x1B, 0xC0, 48 + uxQueueSpacesAvailable( Q_PURCHASE )); //uxQueueSpacesAvailable( Q_PURCHASE )
+        gfprintf( COM2, "%c%cEnter PIN-code  ", 0x1B, 0x80);
+        gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
         //Buffer key
         break;
       case CASH_PAYMENT:

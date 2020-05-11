@@ -43,7 +43,7 @@
 #include "file.h"
 
 // Display Color (For debugging purposes)
-//#include "display_color.h"
+#include "display_color.h"
 
 
 /*****************************    Defines    *******************************/

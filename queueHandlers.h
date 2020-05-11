@@ -16,7 +16,7 @@
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128
 #define QUEUE_SIZE_KEY      8
-#define QUEUE_MAX_PURCHASE  28 //Each purchase minimum takes 5 min
+#define QUEUE_MAX_PURCHASE  288 //Each purchase minimum takes 5 min
 
 
 #endif /* FILES_QUEUEHANDLERS_H_ */
