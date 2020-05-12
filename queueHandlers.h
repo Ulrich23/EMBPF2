@@ -13,6 +13,9 @@
   // Queuehandle for all purchases
   QueueHandle_t Q_PURCHASE;
 
+  // Queuehandle for drejimpuls
+  QueueHandle_t Q_DREJIMPULS;
+
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128
 #define QUEUE_SIZE_KEY      8

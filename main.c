@@ -27,6 +27,7 @@ SDU Portfolio 2 Embedded Programming
 #include "clockTask.h"
 #include "lcdMenuTask.h"
 #include "paymentTask.h"
+#include "drejimpulsTask.h"
 
 
 
@@ -42,6 +43,7 @@ SDU Portfolio 2 Embedded Programming
 #include "semaphoreHandlers.h"
 #include "file.h"
 #include "storage.h"
+
 
 
 
@@ -92,6 +94,7 @@ int main(void)
   Q_LCD = xQueueCreate(QUEUE_SIZE, sizeof(INT8U));
   Q_CLOCK = xQueueCreate( 1 , sizeof( struct time_day) );
   Q_PURCHASE = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof( struct purchase_log));
+  Q_DREJIMPULS = xQueueCreate( 1 , sizeof(INT16U) );
 
   // Create the semaphore
   // ----------------
@@ -102,13 +105,13 @@ int main(void)
   // Start the tasks.
   // ----------------
   xTaskCreate(myTaskTest, "taskTest", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &myTaskTestHandle);
-  xTaskCreate(lcd_task, "lcdTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdTaskHandle);
-  xTaskCreate(key_task, "keyTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &keyTaskHandle);
-  xTaskCreate(clock_task, "clockTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &clockTaskHandle);
+  xTaskCreate(lcd_Task, "lcdTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdTaskHandle);
+  xTaskCreate(key_Task, "keyTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &keyTaskHandle);
+  xTaskCreate(clock_Task, "clockTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &clockTaskHandle);
   xTaskCreate(lcd_Menu_Display_Task, "lcdMenuDisplayTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuDisplayTaskHandle);
   xTaskCreate(lcd_Menu_Task, "lcdMenuTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuTaskHandle);
-  xTaskCreate(payment_task, "paymentTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &paymentTaskHandle);
-  xTaskCreate(drejimpuls_Task, "drejimpulsTask", configMINIMAL_STACK_SIZE, NULL, MED_PRIO, &drejimpulsTaskHandle);
+  xTaskCreate(payment_Task, "paymentTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &paymentTaskHandle);
+  xTaskCreate(drejimpuls_Task, "drejimpulsTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &drejimpulsTaskHandle);
 
 
 

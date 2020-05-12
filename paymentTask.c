@@ -29,7 +29,7 @@
 
 /*****************************   Functions   *******************************/
 
-void payment_task(void* p)
+void payment_Task(void* p)
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
@@ -111,6 +111,9 @@ void payment_task(void* p)
             //If not remove keybuffer -> p_state = CARD_PAYMENT
             break;
           case CASH_PAYMENT:
+
+
+
 
            break;
           default:

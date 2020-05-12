@@ -236,7 +236,7 @@ void out_LCD( INT8U Ch )
 
 
 
-void lcd_task(void *p)
+void lcd_Task(void *p)
 /*****************************************************************************
 *   Input    :
 *   Output   :

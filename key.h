@@ -32,7 +32,7 @@
 /*****************************   Functions   *******************************/
 BOOLEAN get_keyboard( INT8U* );
 BOOLEAN peek_keyboard( INT8U* );
-void key_task(void*);
+void key_Task(void*);
 
 /****************************** End Of Module *******************************/
 #endif

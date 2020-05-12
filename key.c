@@ -71,7 +71,7 @@ BOOLEAN check_column(INT8U x)
     return 0;
 }
 
-void key_task(void *p)
+void key_Task(void *p)
 /*****************************************************************************
 *   Input    :
 *   Output   :

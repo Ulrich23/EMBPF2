@@ -43,7 +43,7 @@ void wr_str_LCD( INT8U* );
 void move_LCD( INT8U, INT8U );
 INT8U wr_ch_LCD( INT8U Ch );
 
-void lcd_task(void*);
+void lcd_Task(void*);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -

@@ -155,6 +155,7 @@ void lcd_Menu_Display_Task(void *p)
   TickType_t myLastUnblock;
   myLastUnblock = xTaskGetTickCount();
   struct purchase_log thisPurch;
+  INT16U peekCounter = 0;
 
   INT8U gasdisplayer = 0; // Needs time to display gas types
   while(1)
@@ -194,8 +195,12 @@ void lcd_Menu_Display_Task(void *p)
         //Buffer key
         break;
       case CASH_PAYMENT:
+
+          //vTaskResume(drejimpulsTaskHandle);
+
+		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
-        gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
+        gfprintf( COM2, "%c%cDKK:%04d        ", 0x1B, 0xC0, peekCounter);
         //Buffer drejimpuls
         break;
       case CHOOSE_GAS:
