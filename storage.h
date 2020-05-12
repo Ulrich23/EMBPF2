@@ -33,7 +33,7 @@ enum purchaseStates
   CARD_ACCEPTED,
   CASH_PAYMENT,
   CHOOSE_GAS,
-  PUMPING,
+  FUELING,
   REFUELING_DONE,
   LOGGED
 };
@@ -68,7 +68,7 @@ struct purchase_log {
   enum purchaseStates p_state;
 };
 
-
+//typedef struct purchase_log *purchase_log_Handle;
 
 
 /*****************************   Constants   *******************************/

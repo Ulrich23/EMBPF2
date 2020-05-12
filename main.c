@@ -108,6 +108,7 @@ int main(void)
   xTaskCreate(lcd_Menu_Display_Task, "lcdMenuDisplayTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuDisplayTaskHandle);
   xTaskCreate(lcd_Menu_Task, "lcdMenuTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuTaskHandle);
   xTaskCreate(payment_task, "paymentTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &paymentTaskHandle);
+  xTaskCreate(drejimpuls_Task, "drejimpulsTask", configMINIMAL_STACK_SIZE, NULL, MED_PRIO, &drejimpulsTaskHandle);
 
 
 

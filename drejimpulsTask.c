@@ -2,7 +2,7 @@
 * University of Southern Denmark
 * Embedded C Programming (ECP)
 *
-* MODULENAME.: fuelingTask.c(.h)
+* MODULENAME.: drejimpulsTask.c(.h)
 *
 * PROJECT....: EMBPF2
 *
@@ -11,7 +11,7 @@
 * Change Log:
 ******************************************************************************
 * Date    Id    Change
-* 8. maj 2020
+* 12. maj 2020
 * --------------------
 * 090215  MoH   Module created.
 *
@@ -26,7 +26,10 @@
 /*****************************   Variables   *******************************/
 
 /*****************************   Functions   *******************************/
+void drejimpuls_Task(void *p)
+{
 
+}
 /*****************************************************************************
 *   Input    : -
 *   Output   : -

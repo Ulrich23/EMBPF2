@@ -51,6 +51,8 @@ void lcd_Menu_Task(void* p)
   struct purchase_log peekPurch;
   UBaseType_t ResponseQueue;
 
+  INT8U gastypeSwitch = 0;
+
   while(1)
   {
      ResponseQueue = uxQueueSpacesAvailable( Q_PURCHASE );
@@ -63,7 +65,7 @@ void lcd_Menu_Task(void* p)
 
      if (SEM_PURCHASE_QUEUE != NULL)
      {
-       if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0))  //Only if purchase qeueue is available
+       if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE)  //Only if purchase qeueue is available
        {
           xQueuePeek(Q_PURCHASE, &peekPurch, 0); //If previous refueling done and logged
           if(peekPurch.p_state == LOGGED)
@@ -88,19 +90,49 @@ void lcd_Menu_Task(void* p)
               }
               else if (get_square_key() == TRUE)
               {
+                xQueueReset( Q_KEY );
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
               }
 
               break;
-            case CARD_PAYMENT:
+            case CHOOSE_GAS:
+            if (uxQueueSpacesAvailable( Q_KEY ) == 7)
+            {
+
+              xQueueReceive(Q_KEY, &gastypeSwitch, (TickType_t) 0);
+              gastypeSwitch -= 48; // Convert ascii to decimal
+              switch (gastypeSwitch) {
+                case 1:
+                thisPurch.product = S_LF92;
+                thisPurch.p_state = FUELING;
+                break;
+                case 2:
+                thisPurch.product = S_LF95;
+                thisPurch.p_state = FUELING;
+                break;
+                case 3:
+                thisPurch.product = S_DIESEL;
+                thisPurch.p_state = FUELING;
+                break;
+                default:
+                break;
+              }
+            }
              break;
+             case FUELING:
+             break;
+
           }
 
           xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
           xSemaphoreGive(SEM_PURCHASE_QUEUE);
         }
+        else{
+          taskYIELD();
+        }
       }
+
 
 
 
@@ -124,12 +156,24 @@ void lcd_Menu_Display_Task(void *p)
   myLastUnblock = xTaskGetTickCount();
   struct purchase_log thisPurch;
 
-
+  INT8U gasdisplayer = 0; // Needs time to display gas types
   while(1)
   {
 
-    vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 400 ) ); // Updating this task every 200ms
+    vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 400 ) ); // Updating this task every 400ms
+
+    //Look at state
     xQueuePeek(Q_PURCHASE, &thisPurch, 0);
+
+    //Count the gas displayer;
+    if (gasdisplayer < 9 && thisPurch.p_state == CHOOSE_GAS){
+      gasdisplayer++;
+    }
+    else{
+      gasdisplayer = 0;
+    }
+
+
     switch (thisPurch.p_state)
     {
       case CHOOSE_PAYMENT:
@@ -152,27 +196,27 @@ void lcd_Menu_Display_Task(void *p)
       case CASH_PAYMENT:
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
         gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
-        //Buffer drejimuls
+        //Buffer drejimpuls
         break;
       case CHOOSE_GAS:
-        switch (gasState)
+        switch (gasdisplayer)
         {
-          case LF92:
-            gfprintf( COM2, "%c%cLeadfree 92     ", 0x1B, 0x80);
+          case 3:  // These are in this specific order so it starts displaying (1), then (2), then (3)
+            gfprintf( COM2, "%c%cLeadfree 92  (1)", 0x1B, 0x80);
             gfprintf( COM2, "%c%cPrice: 8.49DKK/L", 0x1B, 0xC0);
             break;
-          case LF95:
-            gfprintf( COM2, "%c%cLeadfree 95     ", 0x1B, 0x80);
+          case 6:
+            gfprintf( COM2, "%c%cLeadfree 95  (2)", 0x1B, 0x80);
             gfprintf( COM2, "%c%cPrice: 8.79DKK/L", 0x1B, 0xC0);
             break;
-          case DIESEL:
-            gfprintf( COM2, "%c%cDiesel          ", 0x1B, 0x80);
+          case 0:
+            gfprintf( COM2, "%c%cDiesel       (3)", 0x1B, 0x80);
             gfprintf( COM2, "%c%cPrice: 8.12DKK/L", 0x1B, 0xC0);
             break;
         }
       break;
-      case PUMPING:
-        gfprintf( COM2, "%c%cPumping...      ", 0x1B, 0x80);
+      case FUELING:
+        gfprintf( COM2, "%c%cFUELING...      ", 0x1B, 0x80);
         gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
         //Buffer bars
         break;

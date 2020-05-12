@@ -39,9 +39,7 @@ void payment_task(void* p)
   struct purchase_log thisPurch;
 
   INT8U card_Nr[QUEUE_SIZE_KEY] = {0};
-  INT32U card_Nr_Val = 0;
   INT8U pin_Nr[PIN_SIZE_KEY] = {0};
-  INT16U pin_Nr_Val = 0;
 
   while(1)
   {
@@ -51,7 +49,7 @@ void payment_task(void* p)
                                     // so a context switch doesnt happen while we are holding the semaphore
                                     // therefore stucking it?
     {
-      if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0))
+      if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE)
       {
         xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0 );
         switch (thisPurch.p_state)
@@ -60,7 +58,7 @@ void payment_task(void* p)
             //look at keybuffer
             //if 8 wait 200 ms -> p_state = CARD_ACCEPTED
             //else nothing
-            if(uxQueueSpacesAvailable( Q_KEY ) == 0) // Burde være 8 siden vi lige har clearet den i lcdMenuTask
+            if(uxQueueSpacesAvailable( Q_KEY ) == 0) // Burde vï¿½re 8 siden vi lige har clearet den i lcdMenuTask
                                                      // Load the newly 8 key presses into the card_Nr array
             {
               for (INT8U i = 0; i < QUEUE_SIZE_KEY; i++)
@@ -85,36 +83,26 @@ void payment_task(void* p)
                   xQueueReceive(Q_KEY, &pin_Nr[i], (TickType_t) 0);
                 }
 
-                // Loop to calculate the card and pin numbers as integers
-                for (INT8S i = QUEUE_SIZE_KEY-1, k = 1; i >= 0; i--, k*=10)
-                {
-                    if(i >= PIN_SIZE_KEY)
-                    {
-                        pin_Nr_Val += pin_Nr[i-PIN_SIZE_KEY]*k;
-                    }
-                    card_Nr_Val += card_Nr[i]*k;
 
+
+                if( (card_Nr[QUEUE_SIZE_KEY-1]%2) == 0 && (pin_Nr[PIN_SIZE_KEY-1]%2) != 0 ){
+
+                    xQueueReset( Q_KEY ); // FLUSH the queue with key values Q_KEY
+
+                    thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
                 }
+                else if( (card_Nr[QUEUE_SIZE_KEY-1]%2) != 0 && (pin_Nr[PIN_SIZE_KEY-1]%2) == 0 ){
+                  
+                    xQueueReset( Q_KEY ); // FLUSH the queue with key values Q_KEY
 
-
-                if( (card_Nr_Val%2) == 0 && (pin_Nr_Val%2) != 0 ){
-                    // This line below is a test and state needs to be changed!
-                    thisPurch.p_state = CASH_PAYMENT; // Valid combination, go to next state
-
-                }
-                else if( (card_Nr_Val%2) != 0 && (pin_Nr_Val%2) == 0 ){
-                    // This line below is a test and state needs to be changed!
-                    thisPurch.p_state = CASH_PAYMENT; // Valid combination, go to next state
+                    thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
                 }
                 else{
-                    // Reset purchase, reset the thisPurch object and go to state CHOOSE PAYMENT
-                    // OR
-                    // Set thispurch state to CARD PAYMENT, to genindtast the card_Nr and pin_Nr (i like this one)
-                    // REMEMBER to reset the keyboard values xQueueReset( Q_KEY ); before, so the state is exactly as it was
-                    // before.
-
+                    // Enter the card nr and pin again if wrong combination is pressed:
+                    xQueueReset( Q_KEY ); // FLUSH the queue with key values Q_KEY
+                    thisPurch.p_state = CHOOSE_PAYMENT;
                 }
 
 
@@ -131,6 +119,10 @@ void payment_task(void* p)
 
         xQueueSendToFront(Q_PURCHASE, &thisPurch,0);
         xSemaphoreGive(SEM_PURCHASE_QUEUE);
+      }
+      else
+      {
+        taskYIELD();
       }
     }
 
