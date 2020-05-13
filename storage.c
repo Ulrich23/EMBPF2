@@ -29,10 +29,11 @@
 void bcd(FP32 fuel, INT8U arr[2])
 {
     // fuel = 11.24
-    INT8U fuel_int = fuel * 100;
+    FP32 fuel_int = fuel * 100;
+    int temp = (int) fuel_int;
     // fuel_int = 1124
-    arr[0] = fuel_int/100; // = 11
-    arr[1] = fuel_int%100; // = 24
+    arr[0] = temp/100; // = 11
+    arr[1] = temp%100; // = 24
 }
 /*****************************************************************************
 *   Input    : -

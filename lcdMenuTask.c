@@ -225,17 +225,34 @@ void lcd_Menu_Display_Task(void *p)
           case 3:  // These are in this specific order so it starts displaying (1), then (2), then (3)
 			bcd(currentPrice.LF92_Price, myarr);
             gfprintf( COM2, "%c%cLeadfree 92  (1)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
+            if(myarr[0] >= 10){
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
+            else{
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
             break;
           case 6:
 			bcd(currentPrice.LF95_Price, myarr);
             gfprintf( COM2, "%c%cLeadfree 95  (2)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
+            if(myarr[0] >= 10){
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
+            else{
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
+
             break;
           case 0:
 			bcd(currentPrice.DIESEL_Price, myarr);
             gfprintf( COM2, "%c%cDiesel       (3)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
+            if(myarr[0] >= 10){
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
+            else{
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+            }
+
             break;
         }
       break;
