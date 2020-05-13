@@ -47,34 +47,35 @@ void lcd_Menu_Task(void* p)
 *   Function : -
 ******************************************************************************/
 {
-  struct purchase_log thisPurch;
-  struct purchase_log peekPurch;
+  struct purchase_state thisPurch;
+  struct purchase_state peekPurch;
   UBaseType_t ResponseQueue;
 
   INT8U gastypeSwitch = 0;
 
   while(1)
   {
-     ResponseQueue = uxQueueSpacesAvailable( Q_PURCHASE );
-     if(ResponseQueue == 0) // There can't be any more purchases today, (exeeded 288)
-     {
-       gfprintf( COM2, "%c%cToo Many        ", 0x1B, 0x80);
-       gfprintf( COM2, "%c%cPurchases today ", 0x1B, 0xC0);
-       vTaskSuspend ( NULL ); // Suspend the task itself.
-     }
+
 
      if (SEM_PURCHASE_QUEUE != NULL)
      {
        if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE)  //Only if purchase qeueue is available
        {
-          xQueuePeek(Q_PURCHASE, &peekPurch, 0); //If previous refueling done and logged
-          if(peekPurch.p_state == LOGGED)
-          {
-            thisPurch.p_state = CHOOSE_PAYMENT; //Start purchase
-          }
+		  if(uxQueueSpacesAvailable(Q_PURCHASE) == 1 )
+			  {
+			  thisPurch.p_state = CHOOSE_PAYMENT; // create a payment if no purchase is available.
+			  }
           else
-          {
-            xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0); //Else get current purchase
+			  {
+                xQueuePeek(Q_PURCHASE, &peekPurch, 0); //If done and logged start new refueling
+                  if(peekPurch.p_state == LOGGED)
+                  {
+                    thisPurch.p_state = CHOOSE_PAYMENT; //Start purchase
+                  }
+                  else
+                  {
+                    xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0); //Else get current purchase
+                  }
           }
 
 
@@ -86,17 +87,21 @@ void lcd_Menu_Task(void* p)
                 xQueueReset( Q_KEY );
                 thisPurch.p_state = CARD_PAYMENT;
                 thisPurch.card_or_cash = S_CARD;
+                vTaskSuspend( drejimpulsTaskHandle );
 
               }
               else if (get_square_key() == TRUE)
               {
                 xQueueReset( Q_KEY );
+                vTaskResume( drejimpulsTaskHandle );
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
               }
 
               break;
             case CHOOSE_GAS:
+				vTaskSuspend(drejimpulsTaskHandle);
+
             if (uxQueueSpacesAvailable( Q_KEY ) == 7)
             {
 
@@ -106,14 +111,17 @@ void lcd_Menu_Task(void* p)
                 case 1:
                 thisPurch.product = S_LF92;
                 thisPurch.p_state = FUELING;
+                vTaskSuspend( myTaskTestHandle );
                 break;
                 case 2:
                 thisPurch.product = S_LF95;
                 thisPurch.p_state = FUELING;
+				vTaskSuspend( myTaskTestHandle );
                 break;
                 case 3:
                 thisPurch.product = S_DIESEL;
                 thisPurch.p_state = FUELING;
+				vTaskSuspend( myTaskTestHandle );
                 break;
                 default:
                 break;
@@ -121,6 +129,7 @@ void lcd_Menu_Task(void* p)
             }
              break;
              case FUELING:
+                 
              break;
 
           }
@@ -154,10 +163,15 @@ void lcd_Menu_Display_Task(void *p)
 {
   TickType_t myLastUnblock;
   myLastUnblock = xTaskGetTickCount();
-  struct purchase_log thisPurch;
+  struct purchase_state thisPurch;
   INT16U peekCounter = 0;
+  struct gas_price currentPrice;
+  INT8U myarr[2] = {0};
+
+
 
   INT8U gasdisplayer = 0; // Needs time to display gas types
+
   while(1)
   {
 
@@ -195,36 +209,49 @@ void lcd_Menu_Display_Task(void *p)
         //Buffer key
         break;
       case CASH_PAYMENT:
-
+		  
           //vTaskResume(drejimpulsTaskHandle);
 
 		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
-        gfprintf( COM2, "%c%cDKK:%04d        ", 0x1B, 0xC0, peekCounter);
+        gfprintf( COM2, "%c%cDKK:%04d Enter #", 0x1B, 0xC0, peekCounter);
         //Buffer drejimpuls
         break;
       case CHOOSE_GAS:
+          xQueuePeek(Q_GASPRICES, &currentPrice, 0);
+		  
         switch (gasdisplayer)
         {
           case 3:  // These are in this specific order so it starts displaying (1), then (2), then (3)
+			bcd(currentPrice.LF92_Price, myarr);
             gfprintf( COM2, "%c%cLeadfree 92  (1)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%cPrice: 8.49DKK/L", 0x1B, 0xC0);
+            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
             break;
           case 6:
+			bcd(currentPrice.LF95_Price, myarr);
             gfprintf( COM2, "%c%cLeadfree 95  (2)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%cPrice: 8.79DKK/L", 0x1B, 0xC0);
+            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
             break;
           case 0:
+			bcd(currentPrice.DIESEL_Price, myarr);
             gfprintf( COM2, "%c%cDiesel       (3)", 0x1B, 0x80);
-            gfprintf( COM2, "%c%cPrice: 8.12DKK/L", 0x1B, 0xC0);
+            gfprintf( COM2, "%c%c%02d. %02d DKK/L", 0x1B, 0xC0, myarr[0], myarr[1]);
             break;
         }
       break;
+
       case FUELING:
-        gfprintf( COM2, "%c%cFUELING...      ", 0x1B, 0x80);
-        gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
+		    gfprintf( COM2, "%c%cREMOVE NOZZLE   ", 0x1B, 0x80);
+            gfprintf( COM2, "%c%cFuel That Bitch ", 0x1B, 0xC0);
+        
         //Buffer bars
         break;
+      case NOZZLE_REMOVAL:
+		    //Display amount of liters fueled, and total price of that
+	        //gfprintf( COM2, "%c%cLiters: %04d    ", 0x1B, 0x80, (thisPurch.quantity));
+			//gfprintf( COM2, "%c%cDKK: %04d       ", 0x1B, 0xC0, (thisPurch.total_price));
+			break;
+
       case REFUELING_DONE:
         //Buffer Gas typedef
         //Buffer total price

@@ -33,6 +33,7 @@ enum purchaseStates
   CARD_ACCEPTED,
   CASH_PAYMENT,
   CHOOSE_GAS,
+  NOZZLE_REMOVAL,
   FUELING,
   REFUELING_DONE,
   LOGGED
@@ -58,14 +59,28 @@ struct time_day {
 };
 
 
-struct purchase_log {
-  struct time_day time_of_day;
+struct purchase_state {
   enum gasType product;
-  INT16U   quantity;
-  INT16U   operating_time;
-  INT16U   total_price;
-  enum paymentMethod card_or_cash;    //1 for card, 0 for cash
+  INT16U cash_money_baby;
+  enum paymentMethod  card_or_cash;    //1 for card, 0 for cash
   enum purchaseStates p_state;
+};
+
+struct data_log {
+    INT8U time_of_day;
+    enum gasType product;
+    FP32 quantity;
+    INT16U carNr_Or_Cash;
+    enum paymentMethod card_or_cash;    //1 for card, 0 for cash
+};
+
+typedef struct data_log* data_log_Handle;
+
+
+struct gas_price {
+    FP32 LF92_Price;
+    FP32 LF95_Price;
+    FP32 DIESEL_Price;
 };
 
 //typedef struct purchase_log *purchase_log_Handle;
@@ -74,7 +89,7 @@ struct purchase_log {
 /*****************************   Constants   *******************************/
 
 /*****************************   Functions   *******************************/
-
+void bcd(FP32 fuel, INT8U arr[2]);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -

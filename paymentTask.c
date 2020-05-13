@@ -36,20 +36,16 @@ void payment_Task(void* p)
 *   Function : -
 ******************************************************************************/
 {
-  struct purchase_log thisPurch;
+  struct purchase_state thisPurch;
 
   INT8U card_Nr[QUEUE_SIZE_KEY] = {0};
   INT8U pin_Nr[PIN_SIZE_KEY] = {0};
 
   while(1)
   {
-    if (SEM_PURCHASE_QUEUE != NULL) // Should do an else statement where we use taskYIELD()
-                                    // So we dont waste our cycles? here, since the semaphore will not
-                                    // suddenly become available. Also taskYIELD() after each while loop
-                                    // so a context switch doesnt happen while we are holding the semaphore
-                                    // therefore stucking it?
+    if ((SEM_PURCHASE_QUEUE != NULL) && (uxQueueSpacesAvailable(Q_PURCHASE) == 0) ) 
     {
-      if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE)
+      if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE )
       {
         xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0 );
         switch (thisPurch.p_state)
@@ -111,10 +107,13 @@ void payment_Task(void* p)
             //If not remove keybuffer -> p_state = CARD_PAYMENT
             break;
           case CASH_PAYMENT:
-
-
-
-
+			  
+			  if(get_square_key() == TRUE)
+                  {
+					  thisPurch.p_state = CHOOSE_GAS;
+                      xQueuePeek(Q_DREJIMPULS, &thisPurch.cash_money_baby, 0);
+				  }
+              xQueueReset( Q_KEY );
            break;
           default:
            break;

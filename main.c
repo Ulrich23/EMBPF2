@@ -29,6 +29,8 @@ SDU Portfolio 2 Embedded Programming
 #include "paymentTask.h"
 #include "drejimpulsTask.h"
 
+//#include "fuelingTask.h"
+
 
 
 // Display Color (For Debugging Purposes)
@@ -93,8 +95,21 @@ int main(void)
   Q_KEY = xQueueCreate(QUEUE_SIZE_KEY, sizeof(INT8U));
   Q_LCD = xQueueCreate(QUEUE_SIZE, sizeof(INT8U));
   Q_CLOCK = xQueueCreate( 1 , sizeof( struct time_day) );
-  Q_PURCHASE = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof( struct purchase_log));
+  Q_PURCHASE = xQueueCreate(1, sizeof( struct purchase_state));
+  Q_DATA_LOG = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof(data_log_Handle));
   Q_DREJIMPULS = xQueueCreate( 1 , sizeof(INT16U) );
+  Q_GASPRICES = xQueueCreate( 1, sizeof(struct gas_price) );
+
+  //MOVE TO UART
+  struct gas_price defualtPrice;
+  defualtPrice.LF92_Price = 8.49;
+  defualtPrice.LF95_Price = 8.79;
+  defualtPrice.DIESEL_Price = 8.12;
+
+  
+
+  xQueueOverwrite(Q_GASPRICES, &defualtPrice);
+
 
   // Create the semaphore
   // ----------------
@@ -108,11 +123,11 @@ int main(void)
   xTaskCreate(lcd_Task, "lcdTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdTaskHandle);
   xTaskCreate(key_Task, "keyTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &keyTaskHandle);
   xTaskCreate(clock_Task, "clockTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &clockTaskHandle);
-  xTaskCreate(lcd_Menu_Display_Task, "lcdMenuDisplayTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuDisplayTaskHandle);
-  xTaskCreate(lcd_Menu_Task, "lcdMenuTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdMenuTaskHandle);
-  xTaskCreate(payment_Task, "paymentTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &paymentTaskHandle);
-  xTaskCreate(drejimpuls_Task, "drejimpulsTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &drejimpulsTaskHandle);
-
+  xTaskCreate(lcd_Menu_Display_Task, "lcdMenuDisplayTask", (unsigned short) 200, NULL, LOW_PRIO, &lcdMenuDisplayTaskHandle);
+  xTaskCreate(lcd_Menu_Task, "lcdMenuTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &lcdMenuTaskHandle);
+  xTaskCreate(payment_Task, "paymentTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &paymentTaskHandle);
+  xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 200, NULL, MED_PRIO, &drejimpulsTaskHandle);
+  //xTaskCreate(fueling_Task, "fuelingTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &fuelingTaskHandle);
 
 
   // Start the scheduler.

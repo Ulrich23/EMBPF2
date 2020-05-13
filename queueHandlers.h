@@ -16,6 +16,12 @@
   // Queuehandle for drejimpuls
   QueueHandle_t Q_DREJIMPULS;
 
+  // Queuehandle for Gas prices
+  QueueHandle_t Q_GASPRICES;
+
+  // Queuehandle for data logs of previous purchases
+  QueueHandle_t Q_DATA_LOG;
+
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128
 #define QUEUE_SIZE_KEY      8

@@ -3,6 +3,7 @@
 
 void myTaskTest (void *p) // Blinks multicolour on-board LED Green and Red switching every second
 {
+
     TickType_t myLastUnblock;
     myLastUnblock = xTaskGetTickCount();
     while(1) //Tasks must NEVER exit, so while loop must continue forever

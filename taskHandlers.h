@@ -12,5 +12,6 @@ TaskHandle_t lcdMenuDisplayTaskHandle; // Task handle for displayMenuTaskHandle
 TaskHandle_t lcdMenuTaskHandle; // Task handle for lcdMenuTask
 TaskHandle_t paymentTaskHandle;
 TaskHandle_t drejimpulsTaskHandle; // Task handle for drejimpulsTask
+TaskHandle_t fuelingTaskHandle;
 
 #endif /* FILES_TASKHANDLERS_H_ */

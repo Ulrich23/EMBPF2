@@ -40,6 +40,7 @@ void drejimpuls_Task(void *p)
 
 	INT8U AB0[2] = { !(GPIO_PORTA_DATA_R & 0x20), !(GPIO_PORTA_DATA_R & 0x40) };
 	INT8U AB1[2] = { !(GPIO_PORTA_DATA_R & 0x20), !(GPIO_PORTA_DATA_R & 0x40) };
+
 	INT8U YY[2] = { 0,0 };
 
 	TickType_t myLastUnblock;
@@ -52,7 +53,14 @@ void drejimpuls_Task(void *p)
 
 		vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(1)); // This task wakes up every 5ms
 																 // and runs its code
-																 // It is suspended and resumes every 5 ms.
+															// It is suspended and resumes every 5 ms.
+		
+		//read pushDown on digiswitch						
+		if (!(GPIO_PORTA_DATA_R & 0x80))
+		{
+			counter = 0;
+		}										 
+
 
 		AB0[0] = !(GPIO_PORTA_DATA_R & 0x20);
 		AB0[1] = !(GPIO_PORTA_DATA_R & 0x40);

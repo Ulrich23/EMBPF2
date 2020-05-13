@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\FreeRTOS\\Source\\portable",
+    "\\FreeRTOS\\Source\\portable\\MemMang"
   ],
-  "SelectedNode": "\\main.c",
+  "SelectedNode": "\\storage.c",
   "PreviewInSolutionExplorer": false
 }
