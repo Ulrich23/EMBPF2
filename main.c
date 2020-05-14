@@ -131,7 +131,7 @@ int main(void)
   xTaskCreate(lcd_Menu_Task, "lcdMenuTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &lcdMenuTaskHandle);
   xTaskCreate(payment_Task, "paymentTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &paymentTaskHandle);
   xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 200, NULL, MED_PRIO, &drejimpulsTaskHandle);
-  xTaskCreate(fueling_Task, "fuelingTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &fuelingTaskHandle);
+  xTaskCreate(fueling_Task, "fuelingTask", (unsigned short) 200, NULL, LOW_PRIO, &fuelingTaskHandle);
 
 
   // Start the scheduler.
