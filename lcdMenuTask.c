@@ -82,10 +82,12 @@ void lcd_Menu_Task(void* p)
                   }
           }
 
-
+		  
           switch (thisPurch.p_state)
           {
             case CHOOSE_PAYMENT:
+			  vTaskSuspend(fuelingTaskHandle);
+
               //vTaskResume(paymentTaskHandle);
               //vTaskSuspend(fuelingTaskHandle);
               if (get_star_key() == TRUE)
@@ -94,6 +96,7 @@ void lcd_Menu_Task(void* p)
                 thisPurch.p_state = CARD_PAYMENT;
                 thisPurch.card_or_cash = S_CARD;
                 vTaskSuspend( drejimpulsTaskHandle );
+                
                 
 
               }
@@ -104,6 +107,7 @@ void lcd_Menu_Task(void* p)
 
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
+				
               }
 
               break;
@@ -138,7 +142,7 @@ void lcd_Menu_Task(void* p)
             }
              break;
              case FUELING:
-                 //vTaskResume(fuelingTaskHandle);
+                 vTaskResume(fuelingTaskHandle);
                  
              break;
 

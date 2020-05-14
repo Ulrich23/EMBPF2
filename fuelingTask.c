@@ -22,7 +22,15 @@
 #include "fuelingTask.h"
 
 /*****************************    Defines    *******************************/
-
+enum fueling_progress
+{
+	first_flow,
+	regular_flow,
+	last_flow,
+	wait_5_sec,
+	no_flow,
+	logged_fueling
+};
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
@@ -49,7 +57,11 @@ void fueling_Task(void* p)
 	
 	FP32 PulsPrLiter = 512;
 	FP32 Pulses = 0.0f;
+	FP32 gas_price_current = 0.0f;
 
+	enum fueling_progress fueling_state = no_flow;
+
+	INT16U counter_resume = 0;
 
 
 	// SW1 = Nozzle
@@ -65,7 +77,40 @@ void fueling_Task(void* p)
 
 	while (1)
 	{
+		counter_resume = 0;
 		xQueuePeek(Q_PURCHASE, &peekPurch, 0);
+		switch (peekPurch.product)
+		{
+			case S_LF92:
+				gas_price_current = currentPrice.LF92_Price;
+				break;
+			case S_LF95:
+				gas_price_current = currentPrice.LF95_Price;
+				break;
+			case S_DIESEL:
+				gas_price_current = currentPrice.DIESEL_Price;
+				break;
+		}
+		if (peekPurch.card_or_cash == S_CASH)//SCAM?
+		{
+			if ((gas_price_current * 0.15f) > peekPurch.cash_money_baby) //Cost of first and last flow
+			{
+				if (SEM_PURCHASE_QUEUE != NULL)
+				{
+					if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 1000) == pdTRUE) // if there is not enough cash go back to cash payment.
+					{
+						xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0);
+						thisPurch.p_state = CHOOSE_PAYMENT;
+					
+						xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
+						xSemaphoreGive(SEM_PURCHASE_QUEUE);
+					}
+					taskYIELD();
+				}
+			}
+		}
+
+
 		//vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 5 ) );
 
 		if (get_button_id() == CASE_SW1) // Nozzle is removed
@@ -91,6 +136,7 @@ void fueling_Task(void* p)
 						if (thisPurch.p_state == FUELING)
 						{
 							thisPurch.p_state = NOZZLE_REMOVAL;
+							display_color(RED);
 						}
 
 						xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
@@ -106,67 +152,119 @@ void fueling_Task(void* p)
 
 			xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
+
 			if ((get_button_id() == CASE_SW2) && (peekPurch.p_state == NOZZLE_REMOVAL))
 			{
-				vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 10 ) ); // Debouncing since SW2 is held down
-				
+				//vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 10 ) ); // Debouncing since SW2 is held down
+				vTaskDelay(10); // Debouncing
 				    // Dette behøves ikke hvis vi laver det sekventielt, det er kun 0.3l/s der skal være i et while loop
 							 // dette skal ændres til 0,3ml stadiet.
-					if(get_button_id() == CASE_SW2) //Debounce
+				fueling_state = first_flow;
+
+					while(!(fueling_state == logged_fueling))
 					{
-						// Hvis der benyttes cash skal der først tjekkes om beløbet overhovedet kan holde til reduced start flow
-						// dette skal implementeres i if statementet lige ovenover denne kommentar.
-						display_color(YELLOW);
-						Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
-						vTaskDelayUntil(&myLastUnblock2, pdMS_TO_TICKS(1000));
-						fuelingAttr[1] = Pulses;
-						xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
-						display_color(YELLOW);
-						Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
-						vTaskDelayUntil(&myLastUnblock2, pdMS_TO_TICKS(1000));
-						fuelingAttr[1] = Pulses;
-						xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
+						display_color(RED);
+						if(!(get_button_id() == CASE_SW2) && (fueling_state == first_flow || fueling_state == regular_flow))
+						{
+							fueling_state = last_flow;
+						}
 						
 
-		
 
-						while(get_button_id() == CASE_SW2) // Hvis SW2 stadig er holdt nede = fueling er i gang
-														   // 0.3l per sec in this phaze
+						switch (fueling_state)
 						{
+						case first_flow:
+
+							// enough cash? gas_price_current * 0.15f > peekPurch.cash_money_baby - fuelingattr[0]
+							if(peekPurch.card_or_cash == S_CASH)
+							{
+								if ((gas_price_current * 0.15f) > (peekPurch.cash_money_baby - fuelingAttr[0]) ) // is there enough money for first and last flow?
+								{
+									fueling_state = last_flow;
+									break;
+								}
+							}
+
+							for (INT8U i = 0; i < 2; ++i) //2 sec. i -> sec
+							{
+								display_color(YELLOW);
+								Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
+								vTaskDelay(1000);
+								fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
+								fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
+								xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
+							}
+
+							fueling_state = regular_flow;
+							break;
+
+
+						case regular_flow:
+
+							if ((gas_price_current * 0.35f) > (peekPurch.cash_money_baby - fuelingAttr[0]) && (peekPurch.card_or_cash == S_CASH)) // is there enough money for first and last flow?
+							{
+								fueling_state = last_flow;
+								break;
+							}
+
 							display_color(GREEN);
 							Pulses = pulsPrSec(0.3f, PulsPrLiter, Pulses);
-							vTaskDelayUntil(&myLastUnblock2, pdMS_TO_TICKS(1000));
-							fuelingAttr[1] = Pulses;
+							vTaskDelay(1000);
+							fuelingAttr[1] += ((INT16U)Pulses / 512.0f; // Liters
+							fuelingAttr[0] += ((INT16U)Pulses / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
-							// Hvis der benyttes cash skal der trækkes x antal moneys fra, hvis det overstiger beløbet BREAK
+							break;
 
+						case last_flow:
+							
+							display_color(YELLOW);
+							Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
+							vTaskDelay(1000);
+							fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
+							fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
+							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
+
+							fueling_state = no_flow; //mofo
+
+							
+							break;
+						case no_flow:
+							
+							display_color(RED); //WE DONE BABY
+
+							vTaskDelay(10);
+							counter_resume++;
+
+							if(peekPurch.card_or_cash == S_CARD)
+							{
+								if((get_button_id() == CASE_SW2) && (counter_resume < 500) )
+								{
+									fueling_state = first_flow;
+									counter_resume = 0;
+
+								}
+							}
+							if(counter_resume > 1500)
+							{
+								fueling_state = logged_fueling;
+							}
+
+							break;
+						
 						}
-						//display_color(YELLOW);
-						//Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);// Når SW2 slippes igen, = 0.05l/sek i 1 sek
-						//vTaskDelayUntil(&myLastUnblock2, pdMS_TO_TICKS(1000));
-						//fuelingAttr[1] = Pulses;
-						//xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
 						
 
-				
 
-						// afslut fueling.
-						// Omregn liter til pulses/L
-						// Gem de værdier der skal gemmes i et data_log objekt (tidsplunkt på dagen, quantity, antal penge tanket for)
-						// send objektet til front i data_log queuen.
-						// Sæt state til logged
-						//break dette loop
-						// denne task skal blockeres således at man ikke kan bruge Switchesne så husk at resume den når vi kommer
-						// herind, og vtasksuspend (NULL) sig selv her i slutningen efter vi har breaket loopet.
-						//.....................
-			
-				
 					}
-					
+					display_color(BLUE);
+					// logging...
+					// Reset fueling_state to no_flow and SUSPEND THIS TASK
 
-						
+
+
+							
 				
 					
 				
