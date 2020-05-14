@@ -39,15 +39,17 @@ void fueling_Task(void* p)
 	// SW1 = Nozzle
 	// SW2 = Valve Lever
 
-	FP32 total_Price = 0.0;  // measured in DKK
-	FP32 gas_quantity = 0.0; // measured in liters
+	FP32 fuelingAttr[2] = { 0.0 }; //Pos 0 total_price in DKK. Pos 2 gas quantity measured in liters.
+
+	//TickType_t myLastUnblock;
+    //myLastUnblock = xTaskGetTickCount();
 
 	while (1)
 	{
 
+		//vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 5 ) );
 
-
-		if (get_button_id() == CASE_SW1) // Nozzle is removed
+		if (get_button_id() == 5) // Nozzle is removed
 		{
 			if (SEM_PURCHASE_QUEUE != NULL) 
 			{
@@ -57,8 +59,7 @@ void fueling_Task(void* p)
 					//CASE_SW_DOUBLE;
 					if (thisPurch.p_state == FUELING)
 					{
-						//thisPurch.total_price = total_Price;
-						//thisPurch.quantity = gas_quantity;
+						xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 						thisPurch.p_state = NOZZLE_REMOVAL;
 					}
 
@@ -73,6 +74,10 @@ void fueling_Task(void* p)
 
 			//...............
 		}
+		else{
+			// taskYIELD();
+		}
+
 		//puls 25 0.05 liter i 2 sek
 		//puls 153 0.3 liter pr sek
 		//puls 25 0.05 liter i 1 sek

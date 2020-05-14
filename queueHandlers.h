@@ -22,6 +22,9 @@
   // Queuehandle for data logs of previous purchases
   QueueHandle_t Q_DATA_LOG;
 
+  // Fueling display queue
+  QueueHandle_t Q_FUELING_DISPLAY;
+
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128
 #define QUEUE_SIZE_KEY      8

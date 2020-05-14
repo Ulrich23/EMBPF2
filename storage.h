@@ -67,7 +67,7 @@ struct purchase_state {
 };
 
 struct data_log {
-    INT8U time_of_day;
+    struct time_day time_of_day;
     enum gasType product;
     FP32 quantity;
     INT16U carNr_Or_Cash;
@@ -89,7 +89,7 @@ struct gas_price {
 /*****************************   Constants   *******************************/
 
 /*****************************   Functions   *******************************/
-void bcd(FP32 fuel, INT8U arr[2]);
+void bcd(FP32 fuel, INT16U arr[2]);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -

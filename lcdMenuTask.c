@@ -53,9 +53,13 @@ void lcd_Menu_Task(void* p)
 
   INT8U gastypeSwitch = 0;
 
+
+  //TickType_t myLastUnblock;
+  //myLastUnblock = xTaskGetTickCount();
+
   while(1)
   {
-
+	 //vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1 ) );
 
      if (SEM_PURCHASE_QUEUE != NULL)
      {
@@ -82,18 +86,22 @@ void lcd_Menu_Task(void* p)
           switch (thisPurch.p_state)
           {
             case CHOOSE_PAYMENT:
+              //vTaskResume(paymentTaskHandle);
+              //vTaskSuspend(fuelingTaskHandle);
               if (get_star_key() == TRUE)
               {
                 xQueueReset( Q_KEY );
                 thisPurch.p_state = CARD_PAYMENT;
                 thisPurch.card_or_cash = S_CARD;
                 vTaskSuspend( drejimpulsTaskHandle );
+                
 
               }
               else if (get_square_key() == TRUE)
               {
                 xQueueReset( Q_KEY );
                 vTaskResume( drejimpulsTaskHandle );
+
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
               }
@@ -101,6 +109,7 @@ void lcd_Menu_Task(void* p)
               break;
             case CHOOSE_GAS:
 				vTaskSuspend(drejimpulsTaskHandle);
+                //vTaskSuspend(paymentTaskHandle);
 
             if (uxQueueSpacesAvailable( Q_KEY ) == 7)
             {
@@ -129,6 +138,7 @@ void lcd_Menu_Task(void* p)
             }
              break;
              case FUELING:
+                 //vTaskResume(fuelingTaskHandle);
                  
              break;
 
@@ -166,8 +176,8 @@ void lcd_Menu_Display_Task(void *p)
   struct purchase_state thisPurch;
   INT16U peekCounter = 0;
   struct gas_price currentPrice;
-  INT8U myarr[2] = {0};
-
+  INT16U myarr[2] = {0};
+  FP32 myarr_fueling[2] = { 0 };
 
 
   INT8U gasdisplayer = 0; // Needs time to display gas types
@@ -259,14 +269,18 @@ void lcd_Menu_Display_Task(void *p)
 
       case FUELING:
 		    gfprintf( COM2, "%c%cREMOVE NOZZLE   ", 0x1B, 0x80);
-            gfprintf( COM2, "%c%cFuel That Bitch ", 0x1B, 0xC0);
+            gfprintf( COM2, "%c%cFuel ThatBitch %01d", 0x1B, 0xC0, get_button_id());
         
         //Buffer bars
         break;
       case NOZZLE_REMOVAL:
 		    //Display amount of liters fueled, and total price of that
-	        //gfprintf( COM2, "%c%cLiters: %04d    ", 0x1B, 0x80, (thisPurch.quantity));
-			//gfprintf( COM2, "%c%cDKK: %04d       ", 0x1B, 0xC0, (thisPurch.total_price));
+		    xQueuePeek(Q_FUELING_DISPLAY, &myarr_fueling, 0);
+			bcd(myarr_fueling[1], myarr);
+	        gfprintf( COM2, "%c%cLiters: %02d.%02d   ", 0x1B, 0x80, myarr[0], myarr[1]);
+
+            bcd(myarr_fueling[0], myarr);
+			gfprintf( COM2, "%c%cDKK: %03d.%02d     ", 0x1B, 0xC0, myarr[0], myarr[1]);
 			break;
 
       case REFUELING_DONE:

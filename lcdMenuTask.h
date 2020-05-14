@@ -41,6 +41,7 @@
 #include "ui.h"
 #include "string.h"
 #include "file.h"
+#include "switch_id.h"
 
 // Display Color (For debugging purposes)
 #include "display_color.h"

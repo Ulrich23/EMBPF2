@@ -28,6 +28,7 @@ SDU Portfolio 2 Embedded Programming
 #include "lcdMenuTask.h"
 #include "paymentTask.h"
 #include "drejimpulsTask.h"
+#include "fuelingTask.h"
 
 //#include "fuelingTask.h"
 
@@ -99,6 +100,9 @@ int main(void)
   Q_DATA_LOG = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof(data_log_Handle));
   Q_DREJIMPULS = xQueueCreate( 1 , sizeof(INT16U) );
   Q_GASPRICES = xQueueCreate( 1, sizeof(struct gas_price) );
+  Q_FUELING_DISPLAY = xQueueCreate( 1, sizeof( FP32[2] ) );
+
+
 
   //MOVE TO UART
   struct gas_price defualtPrice;
@@ -127,7 +131,7 @@ int main(void)
   xTaskCreate(lcd_Menu_Task, "lcdMenuTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &lcdMenuTaskHandle);
   xTaskCreate(payment_Task, "paymentTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &paymentTaskHandle);
   xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 200, NULL, MED_PRIO, &drejimpulsTaskHandle);
-  //xTaskCreate(fueling_Task, "fuelingTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &fuelingTaskHandle);
+  xTaskCreate(fueling_Task, "fuelingTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &fuelingTaskHandle);
 
 
   // Start the scheduler.
