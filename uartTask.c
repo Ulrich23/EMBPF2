@@ -30,13 +30,13 @@
 
 BOOLEAN uart0_put_q( INT8U ch )
 {
-  xQueueSendToBack( Q_UART_TX, &ch, 1 );
+  xQueueSendToBack( Q_UART_TX, &ch, 0 );
   return( 1 );
 }
 
 BOOLEAN uart0_get_q( INT8U *pch )
 {
-  return( xxQueueReceive( Q_UART_RX, &pch, 1 ));
+  return( xQueueReceive( Q_UART_RX, &pch, 0 ));
 }
 
 BOOLEAN uart0_rx_rdy()
@@ -71,20 +71,27 @@ void uart0_putc( INT8U ch )
   UART0_DR_R = ch;
 }
 
-extern void uart_rx_Task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
+ void uart_rx_Task(void* p)
 /*****************************************************************************
 *   Input    :
 *   Output   :
 *   Function :
 ******************************************************************************/
 {
-  if( uart0_rx_rdy() )
-  	put_queue( Q_UART_RX, uart0_getc(), WAIT_FOREVER );
-  else
-	wait( 1 );
+    if (uart0_rx_rdy())
+    {
+
+        INT16U temp;
+        temp = uart0_getc();
+        xQueueSend(Q_UART_RX, &temp, 0);
+    }
+    else
+    {
+        vTaskDelay(1);
+    }
 }
 
-extern void uart_tx_Task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
+void uart_tx_Task(void *p)
 /*****************************************************************************
 *   Input    :
 *   Output   :
@@ -93,8 +100,12 @@ extern void uart_tx_Task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
 {
   INT8U ch;
 
-  if( get_queue( Q_UART_TX, &ch, WAIT_FOREVER ))
+  if( xQueueReceive( Q_UART_TX, &ch, 0 ))
   	UART0_DR_R = ch;
+  else
+  {
+      vTaskDelay(1);
+  }
 }
 
 INT32U lcrh_databits( INT8U antal_databits )

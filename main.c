@@ -74,6 +74,7 @@ static void setupHardware(void)
   init_gpio();          // Initialize GPIO pins for on board LEDs,
                         // Button Matrix and LCD.
   init_files();
+  //uart0_init( 9600, 8, 1, 'n' );
 }
 
 
@@ -105,7 +106,7 @@ int main(void)
 
   //MOVE TO UART
   struct gas_price defualtPrice;
-  defualtPrice.LF92_Price = 8.49f;
+  defualtPrice.LF92_Price = 8.49f;                  
   defualtPrice.LF95_Price = 8.79f;
   defualtPrice.DIESEL_Price = 8.12f;
 

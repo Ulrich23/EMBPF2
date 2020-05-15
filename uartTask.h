@@ -50,8 +50,8 @@
 BOOLEAN uart0_put_q( INT8U );
 BOOLEAN uart0_get_q( INT8U* );
 
-void uart_tx_Task(INT8U my_id, INT8U my_state, INT8U event, INT8U data);
-void uart_rx_Task(INT8U my_id, INT8U my_state, INT8U event, INT8U data);
+void uart_tx_Task(void* p);
+void uart_rx_Task(void* p);
 
 
 extern void uart0_init( INT32U, INT8U, INT8U, INT8U );

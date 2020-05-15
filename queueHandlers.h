@@ -29,6 +29,7 @@
   QueueHandle_t Q_UART_TX;
 
   // UART receive queue
+  QueueHandle_t Q_UART_RX;
 
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128

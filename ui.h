@@ -21,6 +21,11 @@
   #define _UI_H
 
 /***************************** Include files *******************************/
+#include <stdint.h>
+#include "tm4c123gh6pm.h"
+#include "emp_type.h"
+#include "gpio.h"
+#include "string.h"
 
 /*****************************    Defines    *******************************/
 

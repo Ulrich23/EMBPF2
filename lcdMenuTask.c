@@ -71,7 +71,7 @@ void lcd_Menu_Task(void* p)
 			  }
           else
 			  {
-                xQueuePeek(Q_PURCHASE, &peekPurch, 0); //If done and logged start new refueling
+                xQueuePeek(Q_PURCHASE, &peekPurch, 10); //If done and logged start new refueling
                   if(peekPurch.p_state == LOGGED)
                   {
                     thisPurch.p_state = CHOOSE_PAYMENT; //Start purchase
@@ -105,7 +105,7 @@ void lcd_Menu_Task(void* p)
               {
                 xQueueReset( Q_KEY );
                 vTaskResume( drejimpulsTaskHandle );
-
+                display_color(BLUE);
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
 				
@@ -193,7 +193,7 @@ void lcd_Menu_Display_Task(void *p)
     vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 400 ) ); // Updating this task every 400ms
 
     //Look at state
-    xQueuePeek(Q_PURCHASE, &thisPurch, 0);
+    xQueuePeek(Q_PURCHASE, &thisPurch, 10);
 
     //Count the gas displayer;
     if (gasdisplayer < 8 && thisPurch.p_state == CHOOSE_GAS){
@@ -227,13 +227,13 @@ void lcd_Menu_Display_Task(void *p)
 		  
           //vTaskResume(drejimpulsTaskHandle);
 
-		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
+		xQueuePeek(Q_DREJIMPULS, &peekCounter, 10);
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
         gfprintf( COM2, "%c%cDKK:%04d Enter #", 0x1B, 0xC0, peekCounter);
         //Buffer drejimpuls
         break;
       case CHOOSE_GAS:
-          xQueuePeek(Q_GASPRICES, &currentPrice, 0);
+          xQueuePeek(Q_GASPRICES, &currentPrice, 10);
 		  
         switch (gasdisplayer)
         {
@@ -280,7 +280,7 @@ void lcd_Menu_Display_Task(void *p)
         break;
       case NOZZLE_REMOVAL:
 		    //Display amount of liters fueled, and total price of that
-		    xQueuePeek(Q_FUELING_DISPLAY, &myarr_fueling, 0);
+		    xQueuePeek(Q_FUELING_DISPLAY, &myarr_fueling, 10);
 			bcd(myarr_fueling[1], myarr);
 	        gfprintf( COM2, "%c%cLiters: %02d.%02d   ", 0x1B, 0x80, myarr[0], myarr[1]);
 

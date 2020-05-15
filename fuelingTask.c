@@ -50,7 +50,7 @@ void fueling_Task(void* p)
 
 	struct gas_price currentPrice;
 	//Read only acces
-	xQueuePeek(Q_GASPRICES, &currentPrice, 0);
+	xQueuePeek(Q_GASPRICES, &currentPrice, 10);
 
 	BOOLEAN nozzlePicked = 0;
 	
@@ -81,7 +81,7 @@ void fueling_Task(void* p)
 	while (1)
 	{
 		counter_resume = 0;
-		xQueuePeek(Q_PURCHASE, &peekPurch, 0);
+		xQueuePeek(Q_PURCHASE, &peekPurch, 10);
 		switch (peekPurch.product)
 		{
 			case S_LF92:
@@ -94,7 +94,7 @@ void fueling_Task(void* p)
 				gas_price_current = currentPrice.DIESEL_Price;
 				break;
 		}
-		if (peekPurch.card_or_cash == S_CASH)//SCAM?
+		if (peekPurch.card_or_cash == S_CASH && peekPurch.p_state == FUELING)//SCAM?
 		{
 			if ((gas_price_current * 0.15f) >= peekPurch.cash_money_baby) //Cost of first and last flow
 			{
@@ -296,10 +296,11 @@ void fueling_Task(void* p)
 
 		}
 		// LOGGING
-		if (peekPurch.p_state == NOZZLE_REMOVAL && nozzlePicked == 0)
+		xQueuePeek(Q_PURCHASE, &peekPurch, 10);
+		if ((peekPurch.p_state == NOZZLE_REMOVAL) && (nozzlePicked == 0))
 		{
 			struct data_log thisLog;
-			xQueuePeek(Q_CLOCK, &thisLog.time_of_day, 0);
+			xQueuePeek(Q_CLOCK, &thisLog.time_of_day, 10);
 			
 			thisLog.product = peekPurch.product;
 			thisLog.quantity = fuelingAttr[1];
@@ -322,6 +323,7 @@ void fueling_Task(void* p)
 				{
 					xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t)0);
 					//CASE_SW_DOUBLE;
+					
 					thisPurch.p_state = CHOOSE_PAYMENT;
 					
 					xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
@@ -331,6 +333,7 @@ void fueling_Task(void* p)
 
 			}
 			fueling_state = no_flow;
+			xQueueReset( Q_KEY );
 			vTaskSuspend(NULL);
 		}
 

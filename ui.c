@@ -18,17 +18,9 @@
 *****************************************************************************/
 
 /***************************** Include files *******************************/
-#include <stdint.h>
-#include "tm4c123gh6pm.h"
-#include "emp_type.h"
-#include "gpio.h"
-//#include "systick.h"
-//#include "tmodel.h"
-//#include "systick.h"
+
 #include "ui.h"
-//#include "rtc.h"
-#include "string.h"
-//#include "glob_def.h"
+
 /*****************************    Defines    *******************************/
 
 /*****************************   Constants   *******************************/
@@ -36,6 +28,9 @@
 /*****************************   Variables   *******************************/
 INT8U counter_star;
 INT8U counter_square;
+INT8U i;
+INT8U  InBuf[128];
+
 /*****************************   Functions   *******************************/
 
 BOOLEAN get_star_key()
@@ -85,4 +80,33 @@ BOOLEAN get_square_key()
     }
     return(result_square);
 }
+
+//void ui_task(INT8U my_id, INT8U my_state, INT8U event, INT8U data)
+/*****************************************************************************
+*   Input    :
+*   Output   :
+*   Function :
+******************************************************************************/
+/*
+INT8U ch;
+
+if( get_file( COM1, &ch ))                                        // get char from uart (COM1)
+{
+    if( i < 128 )
+    {
+        InBuf[i++] = ch;                                              // puts char in the buffer InBuf
+        put_file( COM1, ch );                                           // puts the char back to uart so we can see what we type in the terminal
+        if( ch == '\r' )                                                // if the current char is 'Enter' then...
+        {
+            if()
+            {
+
+            }
+        }
+        i = 0;
+    }
+}
+
+
+*/
 /****************************** End Of Module *******************************/
