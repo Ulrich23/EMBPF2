@@ -106,9 +106,9 @@ int main(void)
 
   //MOVE TO UART
   struct gas_price defualtPrice;
-  defualtPrice.LF92_Price = 8.49;
-  defualtPrice.LF95_Price = 8.79;
-  defualtPrice.DIESEL_Price = 8.12;
+  defualtPrice.LF92_Price = 8.49f;
+  defualtPrice.LF95_Price = 8.79f;
+  defualtPrice.DIESEL_Price = 199.9999f;
 
   
 

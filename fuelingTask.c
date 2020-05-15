@@ -75,9 +75,13 @@ void fueling_Task(void* p)
 	TickType_t myLastUnblock2;
     myLastUnblock2 = xTaskGetTickCount();
 
+	vTaskSuspend(NULL);
+
+
 	while (1)
 	{
 		counter_resume = 0;
+		nozzlePicked = 0;
 		xQueuePeek(Q_PURCHASE, &peekPurch, 0);
 		switch (peekPurch.product)
 		{
@@ -93,11 +97,11 @@ void fueling_Task(void* p)
 		}
 		if (peekPurch.card_or_cash == S_CASH)//SCAM?
 		{
-			if ((gas_price_current * 0.15f) > peekPurch.cash_money_baby) //Cost of first and last flow
+			if ((gas_price_current * 0.15f) >= peekPurch.cash_money_baby) //Cost of first and last flow
 			{
 				if (SEM_PURCHASE_QUEUE != NULL)
 				{
-					if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 1000) == pdTRUE) // if there is not enough cash go back to cash payment.
+					if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE) // if there is not enough cash go back to cash payment.
 					{
 						xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0);
 						thisPurch.p_state = CHOOSE_PAYMENT;
@@ -178,7 +182,7 @@ void fueling_Task(void* p)
 							// enough cash? gas_price_current * 0.15f > peekPurch.cash_money_baby - fuelingattr[0]
 							if(peekPurch.card_or_cash == S_CASH)
 							{
-								if ((gas_price_current * 0.15f) > (peekPurch.cash_money_baby - fuelingAttr[0]) ) // is there enough money for first and last flow?
+								if ((gas_price_current * 0.15f) >= (peekPurch.cash_money_baby - fuelingAttr[0]) ) // is there enough money for first and last flow?
 								{
 									fueling_state = last_flow;
 									break;
@@ -201,7 +205,7 @@ void fueling_Task(void* p)
 
 						case regular_flow:
 
-							if ((gas_price_current * 0.35f) > (peekPurch.cash_money_baby - fuelingAttr[0]) && (peekPurch.card_or_cash == S_CASH)) // is there enough money for first and last flow?
+							if ((gas_price_current * 0.35f) >= (peekPurch.cash_money_baby - fuelingAttr[0]) && (peekPurch.card_or_cash == S_CASH)) // is there enough money for first and last flow?
 							{
 								fueling_state = last_flow;
 								break;
@@ -210,8 +214,8 @@ void fueling_Task(void* p)
 							display_color(GREEN);
 							Pulses = pulsPrSec(0.3f, PulsPrLiter, Pulses);
 							vTaskDelay(1000);
-							fuelingAttr[1] += ((INT16U)Pulses / 512.0f; // Liters
-							fuelingAttr[0] += ((INT16U)Pulses / PulsPrLiter * gas_price_current; // Price in DKK
+							fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
+							fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
 							break;
