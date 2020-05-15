@@ -87,6 +87,7 @@ void lcd_Menu_Task(void* p)
           {
             case CHOOSE_PAYMENT:
 			  vTaskSuspend(fuelingTaskHandle);
+              vTaskResume(myTaskTestHandle);
 
               //vTaskResume(paymentTaskHandle);
               //vTaskSuspend(fuelingTaskHandle);
@@ -195,7 +196,7 @@ void lcd_Menu_Display_Task(void *p)
     xQueuePeek(Q_PURCHASE, &thisPurch, 0);
 
     //Count the gas displayer;
-    if (gasdisplayer < 9 && thisPurch.p_state == CHOOSE_GAS){
+    if (gasdisplayer < 8 && thisPurch.p_state == CHOOSE_GAS){
       gasdisplayer++;
     }
     else{

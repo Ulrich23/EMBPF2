@@ -77,7 +77,6 @@ static void setupHardware(void)
 }
 
 
-
 int main(void)
 /*****************************************************************************
 *   Input    :
@@ -97,7 +96,7 @@ int main(void)
   Q_LCD = xQueueCreate(QUEUE_SIZE, sizeof(INT8U));
   Q_CLOCK = xQueueCreate( 1 , sizeof( struct time_day) );
   Q_PURCHASE = xQueueCreate(1, sizeof( struct purchase_state));
-  Q_DATA_LOG = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof(data_log_Handle));
+  //Q_DATA_LOG = xQueueCreate(QUEUE_MAX_PURCHASE, sizeof(data_log_Handle));
   Q_DREJIMPULS = xQueueCreate( 1 , sizeof(INT16U) );
   Q_GASPRICES = xQueueCreate( 1, sizeof(struct gas_price) );
   Q_FUELING_DISPLAY = xQueueCreate( 1, sizeof( FP32[2] ) );
@@ -108,7 +107,7 @@ int main(void)
   struct gas_price defualtPrice;
   defualtPrice.LF92_Price = 8.49f;
   defualtPrice.LF95_Price = 8.79f;
-  defualtPrice.DIESEL_Price = 199.9999f;
+  defualtPrice.DIESEL_Price = 8.12f;
 
   
 
@@ -130,7 +129,7 @@ int main(void)
   xTaskCreate(lcd_Menu_Display_Task, "lcdMenuDisplayTask", (unsigned short) 200, NULL, LOW_PRIO, &lcdMenuDisplayTaskHandle);
   xTaskCreate(lcd_Menu_Task, "lcdMenuTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &lcdMenuTaskHandle);
   xTaskCreate(payment_Task, "paymentTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &paymentTaskHandle);
-  xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 200, NULL, MED_PRIO, &drejimpulsTaskHandle);
+  xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 70, NULL, MED_PRIO, &drejimpulsTaskHandle);
   xTaskCreate(fueling_Task, "fuelingTask", (unsigned short) 200, NULL, LOW_PRIO, &fuelingTaskHandle);
 
 

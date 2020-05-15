@@ -20,15 +20,20 @@
   QueueHandle_t Q_GASPRICES;
 
   // Queuehandle for data logs of previous purchases
-  QueueHandle_t Q_DATA_LOG;
+  //QueueHandle_t Q_DATA_LOG;
 
   // Fueling display queue
   QueueHandle_t Q_FUELING_DISPLAY;
 
+  // UART transmit queue
+  QueueHandle_t Q_UART_TX;
+
+  // UART receive queue
+
 /*****************************    Defines    *******************************/
 #define QUEUE_SIZE          128
 #define QUEUE_SIZE_KEY      8
-#define QUEUE_MAX_PURCHASE  288 //Each purchase minimum takes 5 min
+#define QUEUE_MAX_PURCHASE  20 //Each purchase minimum takes 5 min
 
 
 #endif /* FILES_QUEUEHANDLERS_H_ */

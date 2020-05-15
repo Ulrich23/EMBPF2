@@ -51,7 +51,7 @@
 
 void fueling_Task(void* p);
 
-FP32 pulsPrSec(FP32 literPrSec, FP32 pulsPrL, FP32 quant);
+FP32 pulsPrSec(FP32 literPrSec, FP32 pulsPrL);
 
 /*****************************************************************************
 *   Input    : -

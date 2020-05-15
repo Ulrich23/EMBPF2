@@ -24,8 +24,32 @@
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
-
+//data_log_pool.counter = 0;
 /*****************************   Functions   *******************************/
+
+void put_purchase_data(struct data_log data)
+{
+    static INT16U purchase_counter; // Initialized as zero by default
+    purchase_log[purchase_counter] = data;
+    purchase_counter++;
+    if (purchase_counter == QUEUE_MAX_PURCHASE)
+    {
+        purchase_counter = 0;
+    }
+}
+
+//struct data_log* prvGetBuffer(struct dataLOG_BufferPOOL* bufPool)
+//{
+//    INT16U count = (*bufPool).counter;
+//    struct data_log data* = &((*bufPool).pool[count]);
+//    (*bufPool).counter = count + 1;
+//    if (count == QUEUE_MAX_PURCHASE)
+//    {
+//        (*bufPool).counter = 0;
+//    }
+//    return data;
+//}
+
 void bcd(FP32 fuel, INT16U arr[2])
 {
 

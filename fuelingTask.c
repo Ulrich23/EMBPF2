@@ -36,9 +36,9 @@ enum fueling_progress
 /*****************************   Variables   *******************************/
 
 /*****************************   Functions   *******************************/
-FP32 pulsPrSec(FP32 literPrSec, FP32 pulsPrL, FP32 quant)
+FP32 pulsPrSec(FP32 literPrSec, FP32 pulsPrL)
 {
-	FP32 res = quant;
+	FP32 res = 0.0f;
 	res += (literPrSec) * (pulsPrL); //L/S * P/L -> P/S
 	return res;
 
@@ -81,7 +81,6 @@ void fueling_Task(void* p)
 	while (1)
 	{
 		counter_resume = 0;
-		nozzlePicked = 0;
 		xQueuePeek(Q_PURCHASE, &peekPurch, 0);
 		switch (peekPurch.product)
 		{
@@ -157,7 +156,7 @@ void fueling_Task(void* p)
 			xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
 
-			if ((get_button_id() == CASE_SW2) && (peekPurch.p_state == NOZZLE_REMOVAL))
+			if ((get_button_id() == CASE_SW2) && !(fueling_state == logged_fueling))
 			{
 				//vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 10 ) ); // Debouncing since SW2 is held down
 				vTaskDelay(10); // Debouncing
@@ -167,6 +166,18 @@ void fueling_Task(void* p)
 
 					while(!(fueling_state == logged_fueling))
 					{
+						if (get_button_id() == CASE_SW1) // Nozzle is removed
+						{
+							vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(5));
+							while (get_button_id() == CASE_SW1)
+							{
+								taskYIELD();
+							}
+							nozzlePicked = !nozzlePicked;
+							fueling_state = no_flow;
+
+						}
+
 						display_color(RED);
 						if(!(get_button_id() == CASE_SW2) && (fueling_state == first_flow || fueling_state == regular_flow))
 						{
@@ -182,6 +193,7 @@ void fueling_Task(void* p)
 							// enough cash? gas_price_current * 0.15f > peekPurch.cash_money_baby - fuelingattr[0]
 							if(peekPurch.card_or_cash == S_CASH)
 							{
+								
 								if ((gas_price_current * 0.15f) >= (peekPurch.cash_money_baby - fuelingAttr[0]) ) // is there enough money for first and last flow?
 								{
 									fueling_state = last_flow;
@@ -189,13 +201,14 @@ void fueling_Task(void* p)
 								}
 							}
 
+
 							for (INT8U i = 0; i < 2; ++i) //2 sec. i -> sec
 							{
 								display_color(YELLOW);
-								Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
+								Pulses += pulsPrSec(0.05f, PulsPrLiter); 
 								vTaskDelay(1000);
-								fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
-								fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
+								fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
+								fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 								xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 							}
 
@@ -212,10 +225,10 @@ void fueling_Task(void* p)
 							}
 
 							display_color(GREEN);
-							Pulses = pulsPrSec(0.3f, PulsPrLiter, Pulses);
+							Pulses += pulsPrSec(0.3f, PulsPrLiter);
 							vTaskDelay(1000);
-							fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
-							fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
+							fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
+							fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
 							break;
@@ -223,10 +236,10 @@ void fueling_Task(void* p)
 						case last_flow:
 							
 							display_color(YELLOW);
-							Pulses = pulsPrSec(0.05f, PulsPrLiter, Pulses);
+							Pulses += pulsPrSec(0.05f, PulsPrLiter);
 							vTaskDelay(1000);
-							fuelingAttr[1] += ((INT16U)Pulses) / 512.0f; // Liters
-							fuelingAttr[0] += ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
+							fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
+							fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
 
 							fueling_state = no_flow; //mofo
@@ -253,6 +266,11 @@ void fueling_Task(void* p)
 							{
 								fueling_state = logged_fueling;
 							}
+							if (nozzlePicked == 0)
+							{
+								fueling_state = logged_fueling;
+							}
+
 
 							break;
 						
@@ -262,23 +280,70 @@ void fueling_Task(void* p)
 
 
 					}
-					display_color(BLUE);
-					// logging...
-					// Reset fueling_state to no_flow and SUSPEND THIS TASK
-
-
-
-							
-				
 					
-				
 
-				
+					// logging...
+					// Reset fueling_state to no_flow
+					// SUSPEND THIS TASK
+					// Reset nozzlePicked = 0;
+
 
 			}
 
 
+
+
+
 		}
+		// LOGGING
+		if (peekPurch.p_state == NOZZLE_REMOVAL && nozzlePicked == 0)
+		{
+			struct data_log thisLog;
+			xQueuePeek(Q_CLOCK, &thisLog.time_of_day, 0);
+			
+			thisLog.product = peekPurch.product;
+			thisLog.quantity = fuelingAttr[1];
+			if (peekPurch.card_or_cash == S_CASH)
+			{
+				thisLog.carNr_Or_Cash = fuelingAttr[0];
+			}
+			else
+			{
+				thisLog.carNr_Or_Cash = peekPurch.cash_money_baby; //Is card number if card_or_cash == S_CARD
+			}
+			
+			thisLog.card_or_cash = peekPurch.card_or_cash;
+
+			put_purchase_data(thisLog); //log data
+
+			if (SEM_PURCHASE_QUEUE != NULL) //Update this purchase state
+			{
+				if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 1000) == pdTRUE)
+				{
+					xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t)0);
+					//CASE_SW_DOUBLE;
+					thisPurch.p_state = CHOOSE_PAYMENT;
+					
+					xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
+					xSemaphoreGive(SEM_PURCHASE_QUEUE);
+					
+				}
+
+			}
+			fueling_state = no_flow;
+			vTaskSuspend(NULL);
+		}
+
+		
+
+		
+		
+		// logging... (yes)
+		// Reset fueling_state to no_flow (yes)
+		// SUSPEND THIS TASK (yes)
+		// Reset nozzlePicked = 0; (yes)
+
+
 
 		//1,953125 mL pr puls
 		//0,512 puls pr mL

@@ -40,6 +40,7 @@ void payment_Task(void* p)
 
   INT8U card_Nr[QUEUE_SIZE_KEY] = {0};
   INT8U pin_Nr[PIN_SIZE_KEY] = {0};
+  INT32U card_Nr_Val = 0;
 
   while(1)
   {
@@ -79,6 +80,7 @@ void payment_Task(void* p)
                   xQueueReceive(Q_KEY, &pin_Nr[i], (TickType_t) 0);
                 }
 
+				
 
 
                 if( (card_Nr[QUEUE_SIZE_KEY-1]%2) == 0 && (pin_Nr[PIN_SIZE_KEY-1]%2) != 0 ){
@@ -87,19 +89,34 @@ void payment_Task(void* p)
 
                     thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
+					// Loop to calculate the card and pin numbers as integers
+                    for (INT8S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
+                    {
+                        card_Nr_Val += (card_Nr[i]-48) * k; // convert ascii to decimal
+                    }
+					thisPurch.cash_money_baby = card_Nr_Val;
+
                 }
+
                 else if( (card_Nr[QUEUE_SIZE_KEY-1]%2) != 0 && (pin_Nr[PIN_SIZE_KEY-1]%2) == 0 ){
                   
                     xQueueReset( Q_KEY ); // FLUSH the queue with key values Q_KEY
 
                     thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
+					// Loop to calculate the card and pin numbers as integers
+                    for (INT8S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
+                    {
+                        card_Nr_Val += (card_Nr[i]-48) * k; // convert ascii to decimal
+                    }
+                    thisPurch.cash_money_baby = card_Nr_Val;
                 }
                 else{
                     // Enter the card nr and pin again if wrong combination is pressed:
                     xQueueReset( Q_KEY ); // FLUSH the queue with key values Q_KEY
                     thisPurch.p_state = CHOOSE_PAYMENT;
                 }
+
 
 
               }

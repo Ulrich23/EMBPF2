@@ -25,6 +25,10 @@
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 
+
+
+#include "FreeRTOS.h"
+#include "queueHandlers.h"
 /*****************************    Defines    *******************************/
 enum purchaseStates
 {
@@ -61,7 +65,7 @@ struct time_day {
 
 struct purchase_state {
   enum gasType product;
-  INT16U cash_money_baby;
+  INT32U cash_money_baby;  // This variable also holds the card nr if card = 1 is chosen
   enum paymentMethod  card_or_cash;    //1 for card, 0 for cash
   enum purchaseStates p_state;
 };
@@ -70,11 +74,15 @@ struct data_log {
     struct time_day time_of_day;
     enum gasType product;
     FP32 quantity;
-    INT16U carNr_Or_Cash;
+    INT32U carNr_Or_Cash;
     enum paymentMethod card_or_cash;    //1 for card, 0 for cash
 };
 
-typedef struct data_log* data_log_Handle;
+struct data_log purchase_log[QUEUE_MAX_PURCHASE];
+
+void put_purchase_data(struct data_log);
+
+//typedef struct data_log* data_log_Handle;
 
 
 struct gas_price {
@@ -85,6 +93,20 @@ struct gas_price {
 
 //typedef struct purchase_log *purchase_log_Handle;
 
+//struct dataLOG_BufferPOOL
+//{
+//    struct data_log pool[QUEUE_MAX_PURCHASE];
+//    INT16U counter;
+//}
+
+//struct dataLOG_BufferPOOL data_log_pool; // creat an object of the BufferPOOL
+
+
+//struct data_log* prvGetBuffer(struct dataLOG_BufferPOOL* bufPool);
+
+//  return buffer to get.
+//  }
+//struct dataLOG_BufferPOOL somename;
 
 /*****************************   Constants   *******************************/
 
