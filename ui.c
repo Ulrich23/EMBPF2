@@ -96,6 +96,8 @@ void ui_Task(void* p)
     while (1)
     {
 
+
+
         if (get_file(COM1, &ch))                                        // get char from uart (COM1)
         {
             if (i < 128)
@@ -121,9 +123,9 @@ void ui_Task(void* p)
                         
                     }
                    
-                    
+                 i = 0;
                 }
-            i = 0;
+
             }
 
         }

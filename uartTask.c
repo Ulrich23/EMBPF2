@@ -36,7 +36,7 @@ BOOLEAN uart0_put_q( INT8U ch )
 
 BOOLEAN uart0_get_q( INT8U *pch )
 {
-  return( xQueueReceive( Q_UART_RX, &pch, 0 ));
+  return( xQueueReceive( Q_UART_RX, pch, 0 ));
 }
 
 BOOLEAN uart0_rx_rdy()
@@ -84,7 +84,7 @@ void uart0_putc( INT8U ch )
          if (uart0_rx_rdy())
          {
 
-             INT16U temp;
+             INT8U temp;
              temp = uart0_getc();
              xQueueSend(Q_UART_RX, &temp, 0); // sends to the back of Q_UART_RX queue
          }
@@ -103,13 +103,22 @@ void uart_tx_Task(void *p)
 ******************************************************************************/
 {
     INT8U ch;
+
+    TickType_t myLastUnblock;
+    myLastUnblock = xTaskGetTickCount();
+
     while(1)
     {
         if( xQueueReceive( Q_UART_TX, &ch, 0 )) // Receives 1 element from the Q_UART_TX queue and saves it to ch
-  	    UART0_DR_R = ch;
+        {
+            UART0_DR_R = ch;
+        vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1 ) );
+            //vTaskDelay(1);
+        }
         else
         {
-            vTaskDelay(1);
+            vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1 ) );
+            //vTaskDelay(5);
         }
     }
 }
