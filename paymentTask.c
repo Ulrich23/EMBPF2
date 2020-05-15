@@ -90,7 +90,7 @@ void payment_Task(void* p)
                     thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
 					// Loop to calculate the card and pin numbers as integers
-                    for (INT8S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
+                    for (INT32S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
                     {
                         card_Nr_Val += (card_Nr[i]-48) * k; // convert ascii to decimal
                     }
@@ -105,7 +105,7 @@ void payment_Task(void* p)
                     thisPurch.p_state = CHOOSE_GAS; // Valid combination, go to next state
 
 					// Loop to calculate the card and pin numbers as integers
-                    for (INT8S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
+                    for (INT32S i = QUEUE_SIZE_KEY - 1, k = 1; i >= 0; i--, k *= 10)
                     {
                         card_Nr_Val += (card_Nr[i]-48) * k; // convert ascii to decimal
                     }

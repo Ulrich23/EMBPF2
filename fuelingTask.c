@@ -124,6 +124,7 @@ void fueling_Task(void* p)
 			while (get_button_id() == CASE_SW1)
 			{
 				taskYIELD();
+				//display_color(BLUE);
 			}
 			nozzlePicked = !nozzlePicked;
 			
@@ -174,6 +175,7 @@ void fueling_Task(void* p)
 							while (get_button_id() == CASE_SW1)
 							{
 								taskYIELD();
+								//display_color(BLUE);
 							}
 							nozzlePicked = !nozzlePicked;
 							fueling_state = no_flow;
@@ -181,9 +183,9 @@ void fueling_Task(void* p)
 						}
 
 						display_color(RED);
-						if(!(get_button_id() == CASE_SW2) && (fueling_state == first_flow || fueling_state == regular_flow))
+						if(!(get_button_id() == CASE_SW2) && (fueling_state == first_flow || fueling_state == regular_flow)) // Lever is released
 						{
-							fueling_state = last_flow;
+							fueling_state = last_flow; // goto last flow if lever is released.
 						}
 						
 
@@ -270,6 +272,8 @@ void fueling_Task(void* p)
 							if(counter_resume > 1500)
 							{
 								fueling_state = logged_fueling;
+								nozzlePicked = 0;
+
 							}
 							if (nozzlePicked == 0)
 							{
@@ -303,6 +307,7 @@ void fueling_Task(void* p)
 		// LOGGING
 		xQueuePeek(Q_PURCHASE, &peekPurch, 10);
 		if ((peekPurch.p_state == NOZZLE_REMOVAL) && (nozzlePicked == 0))
+		//if ((peekPurch.p_state == NOZZLE_REMOVAL) && (fueling_state = logged_fueling))
 		{
 			struct data_log thisLog;
 			xQueuePeek(Q_CLOCK, &thisLog.time_of_day, 10);
@@ -324,9 +329,16 @@ void fueling_Task(void* p)
 
 			if (SEM_PURCHASE_QUEUE != NULL) //Update this purchase state
 			{
-				if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 1000) == pdTRUE)
+			    while(1) // loop here until the semaphore becomes available
+			    {
+			        if(uxSemaphoreGetCount(SEM_PURCHASE_QUEUE) == 1) //returns 1 if semaphore is available.
+			        {
+			            break;
+			        }
+			    }
+				if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 10) == pdTRUE)
 				{
-					xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t)0);
+					xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0);
 					//CASE_SW_DOUBLE;
 					
 					thisPurch.p_state = CHOOSE_PAYMENT;
