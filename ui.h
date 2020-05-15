@@ -26,6 +26,18 @@
 #include "emp_type.h"
 #include "gpio.h"
 #include "string.h"
+#include "file.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+
+// Include Task Handlers for each task for task communication
+#include "taskHandlers.h"
+#include "queueHandlers.h"
+
+#include "storage.h"
+
 
 /*****************************    Defines    *******************************/
 
@@ -35,29 +47,29 @@
 
 /*************************  Function interfaces ****************************/
 
-void ui_task(INT8U, INT8U, INT8U, INT8U);
+void ui_Task(void* p);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
 *   Function : Test function
 ******************************************************************************/
-void ui_key_task(INT8U, INT8U, INT8U, INT8U);
+void ui_key_task(void* p);
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
-*   Function : Test function
+*   Function : Not used
 ******************************************************************************/
 BOOLEAN get_star_key();
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
-*   Function : Test function
+*   Function : Testing if the star key is pressed, removing it from Q_KEY after
 ******************************************************************************/
 BOOLEAN get_square_key();
 /*****************************************************************************
 *   Input    : -
 *   Output   : -
-*   Function : Test function
+*   Function : Testing if the square key is pressed, removing it from Q_KEY after 
 ******************************************************************************/
 /****************************** End Of Module *******************************/
 #endif

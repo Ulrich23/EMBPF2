@@ -78,17 +78,21 @@ void uart0_putc( INT8U ch )
 *   Function :
 ******************************************************************************/
 {
-    if (uart0_rx_rdy())
+     while (1) 
     {
 
-        INT16U temp;
-        temp = uart0_getc();
-        xQueueSend(Q_UART_RX, &temp, 0);
-    }
-    else
-    {
-        vTaskDelay(1);
-    }
+         if (uart0_rx_rdy())
+         {
+
+             INT16U temp;
+             temp = uart0_getc();
+             xQueueSend(Q_UART_RX, &temp, 0); // sends to the back of Q_UART_RX queue
+         }
+         else
+         {
+             vTaskDelay(1);
+         }
+     }
 }
 
 void uart_tx_Task(void *p)
@@ -98,14 +102,16 @@ void uart_tx_Task(void *p)
 *   Function :
 ******************************************************************************/
 {
-  INT8U ch;
-
-  if( xQueueReceive( Q_UART_TX, &ch, 0 ))
-  	UART0_DR_R = ch;
-  else
-  {
-      vTaskDelay(1);
-  }
+    INT8U ch;
+    while(1)
+    {
+        if( xQueueReceive( Q_UART_TX, &ch, 0 )) // Receives 1 element from the Q_UART_TX queue and saves it to ch
+  	    UART0_DR_R = ch;
+        else
+        {
+            vTaskDelay(1);
+        }
+    }
 }
 
 INT32U lcrh_databits( INT8U antal_databits )

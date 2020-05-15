@@ -41,6 +41,8 @@
 #include "queueHandlers.h"
 #include "semaphoreHandlers.h"
 #include "storage.h"
+#include "file.h"
+#include "string.h"
 
 /*****************************    Defines    *******************************/
 
@@ -56,7 +58,7 @@ void uart_rx_Task(void* p);
 
 extern void uart0_init( INT32U, INT8U, INT8U, INT8U );
 /*****************************************************************************
-*   Input    : -
+*   Input    : -       baud, size, stopbits, paritybit
 *   Output   : -
 *   Function : Initialize uart 0
 ******************************************************************************/

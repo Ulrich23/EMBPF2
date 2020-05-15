@@ -337,6 +337,7 @@ void fueling_Task(void* p)
 			}
 			// Resetting all values declared at the start of this task, so it will be the same for the next fuelling session
 			counter_resume = 0;
+			Pulses = 0.0;
 			fueling_state = no_flow;
 			fuelingAttr[0] =  0.0 ; 
 			fuelingAttr[1] =  0.0 ;

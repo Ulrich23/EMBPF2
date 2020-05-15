@@ -13,5 +13,8 @@ TaskHandle_t lcdMenuTaskHandle; // Task handle for lcdMenuTask
 TaskHandle_t paymentTaskHandle;
 TaskHandle_t drejimpulsTaskHandle; // Task handle for drejimpulsTask
 TaskHandle_t fuelingTaskHandle;    
+TaskHandle_t uartrxTaskHandle; // Task handle for receive uart
+TaskHandle_t uarttxTaskHandle; // Task handle for transmit uart
+TaskHandle_t uiTaskHandle; // Task handle for ui
 
 #endif /* FILES_TASKHANDLERS_H_ */

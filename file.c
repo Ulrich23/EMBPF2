@@ -26,7 +26,7 @@
 #include "file.h"
 //#include "tmodel.h"
 #include "key.h"
-//#include "uart.h"
+#include "uartTask.h"
 #include "lcd.h"
 
 /*****************************    Defines    *******************************/
@@ -73,8 +73,8 @@ INT8U init_files() //extern
 	  pof[i].put = NULL;
 	  pof[i].get = NULL;
   }
-//  pof[COM1].put = uart0_put_q;
-//  pof[COM1].get = uart0_get_q;
+  pof[COM1].put = uart0_put_q;
+  pof[COM1].get = uart0_get_q; // pof = pool of files
   pof[COM2].put = wr_ch_LCD;
   pof[COM3].get = get_keyboard;
   pof[COM4].get = peek_keyboard;

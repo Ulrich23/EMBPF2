@@ -29,6 +29,7 @@ SDU Portfolio 2 Embedded Programming
 #include "paymentTask.h"
 #include "drejimpulsTask.h"
 #include "fuelingTask.h"
+#include "uartTask.h"
 
 //#include "fuelingTask.h"
 
@@ -74,7 +75,7 @@ static void setupHardware(void)
   init_gpio();          // Initialize GPIO pins for on board LEDs,
                         // Button Matrix and LCD.
   init_files();
-  //uart0_init( 9600, 8, 1, 'n' );
+  uart0_init( 9600, 8, 1, 'n' );
 }
 
 
@@ -101,6 +102,8 @@ int main(void)
   Q_DREJIMPULS = xQueueCreate( 1 , sizeof(INT16U) );
   Q_GASPRICES = xQueueCreate( 1, sizeof(struct gas_price) );
   Q_FUELING_DISPLAY = xQueueCreate( 1, sizeof( FP32[2] ) );
+  Q_UART_TX = xQueueCreate( QUEUE_SIZE, sizeof( INT8U ) );
+  Q_UART_RX = xQueueCreate( QUEUE_SIZE, sizeof( INT8U ) );
 
 
 
@@ -132,6 +135,10 @@ int main(void)
   xTaskCreate(payment_Task, "paymentTask", ( unsigned short ) 200 , NULL, LOW_PRIO, &paymentTaskHandle);
   xTaskCreate(drejimpuls_Task, "drejimpulsTask", (unsigned short) 70, NULL, MED_PRIO, &drejimpulsTaskHandle);
   xTaskCreate(fueling_Task, "fuelingTask", (unsigned short) 200, NULL, LOW_PRIO, &fuelingTaskHandle);
+  xTaskCreate(uart_rx_Task, "uartrxTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uartrxTaskHandle);
+  xTaskCreate(uart_tx_Task, "uarttxTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uarttxTaskHandle);
+  xTaskCreate(ui_Task, "uiTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uiTaskHandle);
+
 
 
   // Start the scheduler.
