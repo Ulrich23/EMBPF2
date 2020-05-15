@@ -325,6 +325,9 @@ void fueling_Task(void* p)
 					//CASE_SW_DOUBLE;
 					
 					thisPurch.p_state = CHOOSE_PAYMENT;
+					thisPurch.cash_money_baby = 0;
+					INT16U temp = 0;
+					xQueueOverwrite(Q_DREJIMPULS, &temp);
 					
 					xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
 					xSemaphoreGive(SEM_PURCHASE_QUEUE);
@@ -332,7 +335,11 @@ void fueling_Task(void* p)
 				}
 
 			}
+			// Resetting all values declared at the start of this task, so it will be the same for the next fuelling session
+			counter_resume = 0;
 			fueling_state = no_flow;
+			fuelingAttr[0] =  0.0 ; 
+			fuelingAttr[1] =  0.0 ;
 			xQueueReset( Q_KEY );
 			vTaskSuspend(NULL);
 		}

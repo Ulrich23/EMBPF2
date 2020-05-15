@@ -100,7 +100,7 @@ if( get_file( COM1, &ch ))                                        // get char fr
         {
             if()
             {
-
+                
             }
         }
         i = 0;

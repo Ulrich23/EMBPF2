@@ -227,7 +227,7 @@ void lcd_Menu_Display_Task(void *p)
 		  
           //vTaskResume(drejimpulsTaskHandle);
 
-		xQueuePeek(Q_DREJIMPULS, &peekCounter, 10);
+		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
         gfprintf( COM2, "%c%cDKK:%04d Enter #", 0x1B, 0xC0, peekCounter);
         //Buffer drejimpuls

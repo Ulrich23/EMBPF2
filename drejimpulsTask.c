@@ -54,6 +54,12 @@ void drejimpuls_Task(void *p)
 		vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(1)); // This task wakes up every 5ms
 																 // and runs its code
 															// It is suspended and resumes every 5 ms.
+		INT16U reset = 0;
+		xQueuePeek(Q_DREJIMPULS, &reset, 0);
+		if (reset == 0)
+		{
+			counter = 0;
+		}
 		
 		//read pushDown on digiswitch						
 		if (!(GPIO_PORTA_DATA_R & 0x80))
