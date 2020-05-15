@@ -29,7 +29,6 @@
 
 void put_purchase_data(struct data_log data)
 {
-    static INT16U purchase_counter; // Initialized as zero by default
     purchase_log[purchase_counter] = data;
     purchase_counter++;
     if (purchase_counter == QUEUE_MAX_PURCHASE)

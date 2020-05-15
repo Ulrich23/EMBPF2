@@ -25,7 +25,9 @@
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 
-
+/********************************Variables**********************************/
+INT64U pump_operating_time;
+INT16U purchase_counter;
 
 #include "FreeRTOS.h"
 #include "queueHandlers.h"

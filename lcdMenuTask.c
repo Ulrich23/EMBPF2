@@ -244,7 +244,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             break;
           case 6:
@@ -254,7 +254,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
 
             break;
@@ -265,7 +265,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
 
             break;

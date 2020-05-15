@@ -79,6 +79,8 @@ static void setupHardware(void)
 }
 
 
+INT16U purchase_counter = 0; // Initialize the purchase counter global variable
+
 int main(void)
 /*****************************************************************************
 *   Input    :

@@ -45,6 +45,8 @@ FP32 pulsPrSec(FP32 literPrSec, FP32 pulsPrL)
 }
 void fueling_Task(void* p)
 {
+	pump_operating_time = 0;
+
 	struct purchase_state thisPurch;
 	struct purchase_state peekPurch;
 
@@ -207,6 +209,7 @@ void fueling_Task(void* p)
 								display_color(YELLOW);
 								Pulses += pulsPrSec(0.05f, PulsPrLiter); 
 								vTaskDelay(1000);
+								pump_operating_time += 1;
 								fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
 								fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 								xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
@@ -227,6 +230,7 @@ void fueling_Task(void* p)
 							display_color(GREEN);
 							Pulses += pulsPrSec(0.3f, PulsPrLiter);
 							vTaskDelay(1000);
+							pump_operating_time += 1;
 							fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
 							fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
@@ -238,6 +242,7 @@ void fueling_Task(void* p)
 							display_color(YELLOW);
 							Pulses += pulsPrSec(0.05f, PulsPrLiter);
 							vTaskDelay(1000);
+							pump_operating_time += 1;
 							fuelingAttr[1] = ((INT16U)Pulses) / 512.0f; // Liters
 							fuelingAttr[0] = ((INT16U)Pulses) / PulsPrLiter * gas_price_current; // Price in DKK
 							xQueueOverwrite(Q_FUELING_DISPLAY, &fuelingAttr);
