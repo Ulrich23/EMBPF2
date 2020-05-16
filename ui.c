@@ -269,20 +269,20 @@ void ui_Task(void* p)
                             
 
                         }
-                        gfprintf(COM1, "\nTotal sales by card %d and by cash %d\n\r", countCardPay, countCashPay);
+                        gfprintf(COM1, "\nTotal card purchases %d and Total cash purchases %d\n\r", countCardPay, countCashPay);
 
                         bcd(soldLD92, myarr);
-                        gfprintf(COM1, "\nTotal income from Lead Free 92: %d.%02d\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Lead Free 92: %d.%02d DKK\r", myarr[0], myarr[1]);
                         bcd(soldLD95, myarr);
-                        gfprintf(COM1, "\nTotal income from Lead Free 95: %d.%02d\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Lead Free 95: %d.%02d DKK\r", myarr[0], myarr[1]);
                         bcd(soldDI, myarr);
-                        gfprintf(COM1, "\nTotal income from Diesel: %d.%02d\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Diesel: %d.%02d DKK\r", myarr[0], myarr[1]);
 
                         FP32 total_sales = soldLD92 + soldLD95 + soldDI;
                         bcd(total_sales, myarr);
-                        gfprintf(COM1, "\nTotal income from all gas types: %d.%02d\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from all gas types: %d.%02d DKK\r", myarr[0], myarr[1]);
 
-                        gfprintf(COM1, "\nTotal operating time of pump %d\n\r", pump_operating_time);
+                        gfprintf(COM1, "\nTotal operating time of pump %d sec\n\r", pump_operating_time);
 
                     }
                    
