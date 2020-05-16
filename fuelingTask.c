@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded C Programming (ECP)
-*
-* MODULENAME.: fuelingTask.c(.h)
-*
-* PROJECT....: EMBPF2
-*
-* DESCRIPTION: -
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* 8. maj 2020
-* --------------------
-* 090215  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 /***************************** Include files *******************************/
@@ -82,8 +73,8 @@ void fueling_Task(void* p)
 
 	while (1)
 	{
-		counter_resume = 0;
-		xQueuePeek(Q_PURCHASE, &peekPurch, 10);
+		counter_resume = 0; // Reset the counter
+		xQueuePeek(Q_PURCHASE, &peekPurch, 10); // Peek the purchase to choose the gas price
 		switch (peekPurch.product)
 		{
 			case S_LF92:
@@ -98,19 +89,20 @@ void fueling_Task(void* p)
 		}
 		if (peekPurch.card_or_cash == S_CASH && peekPurch.p_state == FUELING)//SCAM?
 		{
-			if ((gas_price_current * 0.15f) >= peekPurch.cash_money_baby) //Cost of first and last flow
+			if ((gas_price_current * 0.15f) >= peekPurch.cash_money_baby) // Make sure there is enough cash to complete
+																		  // the Cost of first and last flow
 			{
 				if (SEM_PURCHASE_QUEUE != NULL)
 				{
 					if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE) // if there is not enough cash go back to cash payment.
 					{
 						xQueueReceive(Q_PURCHASE, &thisPurch, (TickType_t) 0);
-						thisPurch.p_state = CHOOSE_PAYMENT;
+						thisPurch.p_state = CHOOSE_PAYMENT; // Reset the purchase (without logging it because it was invalid)
 					
 						xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
 						xSemaphoreGive(SEM_PURCHASE_QUEUE);
 					}
-					taskYIELD();
+					taskYIELD(); // Don't waste time by looping in this task if the semaphore is taken by another task, just force a context switch
 				}
 			}
 		}
@@ -142,7 +134,7 @@ void fueling_Task(void* p)
 						if (thisPurch.p_state == FUELING)
 						{
 							thisPurch.p_state = NOZZLE_REMOVAL;
-							display_color(RED);
+							display_color(RED_EMP);
 						}
 
 						xQueueSendToFront(Q_PURCHASE, &thisPurch, 0);
@@ -163,8 +155,8 @@ void fueling_Task(void* p)
 			{
 				//vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 10 ) ); // Debouncing since SW2 is held down
 				vTaskDelay(10); // Debouncing
-				    // Dette behøves ikke hvis vi laver det sekventielt, det er kun 0.3l/s der skal være i et while loop
-							 // dette skal ændres til 0,3ml stadiet.
+				    // Dette behoeves ikke hvis vi laver det sekventielt, det er kun 0.3l/s der skal vaere i et while loop
+							 // dette skal aendres til 0,3ml stadiet.
 				fueling_state = first_flow;
 
 					while(!(fueling_state == logged_fueling))
@@ -182,7 +174,7 @@ void fueling_Task(void* p)
 
 						}
 
-						display_color(RED);
+						display_color(RED_EMP);
 						if(!(get_button_id() == CASE_SW2) && (fueling_state == first_flow || fueling_state == regular_flow)) // Lever is released
 						{
 							fueling_state = last_flow; // goto last flow if lever is released.
@@ -192,7 +184,7 @@ void fueling_Task(void* p)
 
 						switch (fueling_state)
 						{
-						case first_flow:
+						case first_flow: // Checks on cash amount and fuels with 0.05L/sec for 2 seconds
 
 							// enough cash? gas_price_current * 0.15f > peekPurch.cash_money_baby - fuelingattr[0]
 							if(peekPurch.card_or_cash == S_CASH)
@@ -208,7 +200,7 @@ void fueling_Task(void* p)
 
 							for (INT8U i = 0; i < 2; ++i) //2 sec. i -> sec
 							{
-								display_color(YELLOW);
+								display_color(YELLOW_EMP);
 								Pulses += pulsPrSec(0.05f, PulsPrLiter); 
 								vTaskDelay(1000);
 								pump_operating_time += 1;
@@ -221,15 +213,15 @@ void fueling_Task(void* p)
 							break;
 
 
-						case regular_flow:
+						case regular_flow: // Checks on cash amount and keeps a flow on 0.3L/sec as long as there is enough cash or the lever is released
 
-							if ((gas_price_current * 0.35f) >= (peekPurch.cash_money_baby - fuelingAttr[0]) && (peekPurch.card_or_cash == S_CASH)) // is there enough money for first and last flow?
+							if ((gas_price_current * 0.35f) >= (peekPurch.cash_money_baby - fuelingAttr[0]) && (peekPurch.card_or_cash == S_CASH)) // is there enough money for regular and last flow?
 							{
 								fueling_state = last_flow;
 								break;
 							}
 
-							display_color(GREEN);
+							display_color(GREEN_EMP);
 							Pulses += pulsPrSec(0.3f, PulsPrLiter);
 							vTaskDelay(1000);
 							pump_operating_time += 1;
@@ -239,9 +231,9 @@ void fueling_Task(void* p)
 
 							break;
 
-						case last_flow:
+						case last_flow: // Fuels with 0.05L/sec for 1 second
 							
-							display_color(YELLOW);
+							display_color(YELLOW_EMP);
 							Pulses += pulsPrSec(0.05f, PulsPrLiter);
 							vTaskDelay(1000);
 							pump_operating_time += 1;
@@ -255,7 +247,7 @@ void fueling_Task(void* p)
 							break;
 						case no_flow:
 							
-							display_color(RED); //WE DONE BABY
+							display_color(RED_EMP); // Display color representing no flow
 
 							vTaskDelay(10);
 							counter_resume++;
@@ -269,13 +261,13 @@ void fueling_Task(void* p)
 
 								}
 							}
-							if(counter_resume > 1500)
+							if(counter_resume > 1500) // Checks if 15 seconds has passed after lever release
 							{
 								fueling_state = logged_fueling;
 								nozzlePicked = 0;
 
 							}
-							if (nozzlePicked == 0)
+							if (nozzlePicked == 0) // Checks if the nozzle is put back
 							{
 								fueling_state = logged_fueling;
 							}
@@ -312,11 +304,11 @@ void fueling_Task(void* p)
 			struct data_log thisLog;
 			xQueuePeek(Q_CLOCK, &thisLog.time_of_day, 10);
 			
-			thisLog.product = peekPurch.product;
-			thisLog.quantity = fuelingAttr[1];
+			thisLog.product = peekPurch.product; // log chosen product
+			thisLog.quantity = fuelingAttr[1]; // log quantity of chosen product
 			if (peekPurch.card_or_cash == S_CASH)
 			{
-				//thisLog.carNr_Or_Cash = fuelingAttr[0];
+				thisLog.carNr_Or_Cash = peekPurch.cash_money_baby;
 			}
 			else
 			{

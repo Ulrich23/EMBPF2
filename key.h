@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded Programming (EMP)
-*
-* MODULENAME.: key.h
-*
-* PROJECT....: EMP
-*
-* DESCRIPTION: Test.
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* YYMMDD
-* --------------------
-* 150321  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 #ifndef _KEY_H

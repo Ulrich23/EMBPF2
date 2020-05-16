@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded Programming (EMP)
-*
-* MODULENAME.: gpio.c
-*
-* PROJECT....: EMP
-*
-* DESCRIPTION: See module specification file (.h-file).
-*
-* Change Log:
-*****************************************************************************
-* Date    Id    Change
-* YYMMDD
-* --------------------
-* 150215  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 /***************************** Include files *******************************/

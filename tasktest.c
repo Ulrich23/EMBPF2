@@ -1,3 +1,12 @@
+/*****************************************************************************
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
+*****************************************************************************/
 #include "tasktest.h"
 
 

@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded C Programming (ECP)
-*
-* MODULENAME.: switch_id.h(.h)
-*
-* PROJECT....: Final_assignment_EMB
-*
-* DESCRIPTION: -
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* 12 May 2020
-* --------------------
-* 090215  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 #ifndef SWITCH_ID_H_

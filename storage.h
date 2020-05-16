@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded C Programming (ECP)
-*
-* MODULENAME.: storage.h(.h)
-*
-* PROJECT....: EMBPF2
-*
-* DESCRIPTION: -
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* 8. maj 2020
-* --------------------
-* 090215  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 #ifndef FILES_STORAGE_H_
@@ -65,7 +56,7 @@ struct time_day {
 };
 
 
-struct purchase_state {
+struct purchase_state { // Struct to keep data on the puchase
   enum gasType product;
   INT32U cash_money_baby;  // This variable also holds the card nr if card = 1 is chosen
   enum paymentMethod  card_or_cash;    //1 for card, 0 for cash
@@ -76,7 +67,7 @@ struct data_log {
     struct time_day time_of_day;
     enum gasType product;
     FP32 quantity;
-    INT32U carNr_Or_Cash;
+    INT32U carNr_Or_Cash; // The card number or cash amount is stored here
     enum paymentMethod card_or_cash;    //1 for card, 0 for cash
 };
 

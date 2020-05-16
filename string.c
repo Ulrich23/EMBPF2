@@ -1,9 +1,12 @@
-/*
- * string.c
- *
- *  Created on: 26/12/2011
- *      Author: Morten
- */
+/*****************************************************************************
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
+*****************************************************************************/
 
 #include <stdarg.h>
 #include "emp_type.h"

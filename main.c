@@ -1,6 +1,10 @@
 /*****************************************************************************
 
-SDU Portfolio 2 Embedded Programming
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
 
 *****************************************************************************/
 
@@ -109,7 +113,7 @@ int main(void)
 
 
 
-  //MOVE TO UART
+  // Set the default price for the gas, can be changed later through the UART
   struct gas_price defualtPrice;
   defualtPrice.LF92_Price = 8.49f;                  
   defualtPrice.LF95_Price = 8.79f;
@@ -123,12 +127,14 @@ int main(void)
   // Create the semaphore
   // ----------------
   SEM_PURCHASE_QUEUE = xSemaphoreCreateMutex();
-  SEM_KEY_QUEUE = xSemaphoreCreateMutex();
+  //SEM_KEY_QUEUE = xSemaphoreCreateMutex();
 
 
   // Start the tasks.
   // ----------------
+  // myTaskTest is an alive timer blinking green for 1 sec, then red for 1 sec.
   xTaskCreate(myTaskTest, "taskTest", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &myTaskTestHandle);
+
   xTaskCreate(lcd_Task, "lcdTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &lcdTaskHandle);
   xTaskCreate(key_Task, "keyTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &keyTaskHandle);
   xTaskCreate(clock_Task, "clockTask", configMINIMAL_STACK_SIZE, NULL, HIGH_PRIO, &clockTaskHandle);
@@ -139,7 +145,7 @@ int main(void)
   xTaskCreate(fueling_Task, "fuelingTask", (unsigned short) 200, NULL, LOW_PRIO, &fuelingTaskHandle);
   xTaskCreate(uart_rx_Task, "uartrxTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uartrxTaskHandle);
   xTaskCreate(uart_tx_Task, "uarttxTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uarttxTaskHandle);
-  xTaskCreate(ui_Task, "uiTask", configMINIMAL_STACK_SIZE, NULL, LOW_PRIO, &uiTaskHandle);
+  xTaskCreate(ui_Task, "uiTask", (unsigned short) 200, NULL, LOW_PRIO, &uiTaskHandle);
 
 
 

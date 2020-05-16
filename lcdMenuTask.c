@@ -1,20 +1,11 @@
 /*****************************************************************************
-* University of Southern Denmark
-* Embedded C Programming (ECP)
-*
-* MODULENAME.: lcdMenuTask.c(.h)
-*
-* PROJECT....: EMBPF2
-*
-* DESCRIPTION: -
-*
-* Change Log:
-******************************************************************************
-* Date    Id    Change
-* 8. maj 2020
-* --------------------
-* 090215  MoH   Module created.
-*
+
+SDU Portfolio 2 [Final Assignment] Embedded Programming
+
+Morten Efferbach Toft [motof15@student.sdu.dk]
+Thobias Moldrup Sahi Aggerholm [thagg18@student.sdu.dk]
+Ulrich Farhadi [ulfar18@student.sdu.dk]
+
 *****************************************************************************/
 
 /***************************** Include files *******************************/
@@ -65,7 +56,7 @@ void lcd_Menu_Task(void* p)
      {
        if (xSemaphoreTake(SEM_PURCHASE_QUEUE, 0) == pdTRUE)  //Only if purchase qeueue is available
        {
-		  if(uxQueueSpacesAvailable(Q_PURCHASE) == 1 )
+		  if(uxQueueSpacesAvailable(Q_PURCHASE) == 1 ) 
 			  {
 			  thisPurch.p_state = CHOOSE_PAYMENT; // create a payment if no purchase is available.
 			  }
@@ -82,7 +73,7 @@ void lcd_Menu_Task(void* p)
                   }
           }
 
-		  
+          INT16U peekCounter;
           switch (thisPurch.p_state)
           {
             case CHOOSE_PAYMENT:
@@ -93,7 +84,7 @@ void lcd_Menu_Task(void* p)
               //vTaskSuspend(fuelingTaskHandle);
               if (get_star_key() == TRUE)
               {
-                xQueueReset( Q_KEY );
+                xQueueReset( Q_KEY ); // Makes sure the queue is empty for card_Nr
                 thisPurch.p_state = CARD_PAYMENT;
                 thisPurch.card_or_cash = S_CARD;
                 vTaskSuspend( drejimpulsTaskHandle );
@@ -103,16 +94,18 @@ void lcd_Menu_Task(void* p)
               }
               else if (get_square_key() == TRUE)
               {
-                xQueueReset( Q_KEY );
+                xQueueReset( Q_KEY ); // Makes sure the queue is empty
                 vTaskResume( drejimpulsTaskHandle );
-                display_color(BLUE);
                 thisPurch.p_state = CASH_PAYMENT;
                 thisPurch.card_or_cash = S_CASH;
 				
               }
+              xQueueReset(Q_KEY); // Flush the queue if none of the presses were # or *
 
               break;
             case CHOOSE_GAS:
+                xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
+                thisPurch.cash_money_baby = peekCounter;
 				vTaskSuspend(drejimpulsTaskHandle);
                 //vTaskSuspend(paymentTaskHandle);
 
@@ -227,13 +220,12 @@ void lcd_Menu_Display_Task(void *p)
 		  
           //vTaskResume(drejimpulsTaskHandle);
 
-		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0);
+		xQueuePeek(Q_DREJIMPULS, &peekCounter, 0); // Get the cash amount inserted
         gfprintf( COM2, "%c%cTurn switch     ", 0x1B, 0x80);
         gfprintf( COM2, "%c%cDKK:%04d Enter #", 0x1B, 0xC0, peekCounter);
-        //Buffer drejimpuls
         break;
       case CHOOSE_GAS:
-          xQueuePeek(Q_GASPRICES, &currentPrice, 10);
+          xQueuePeek(Q_GASPRICES, &currentPrice, 10); // Get the current gasprices
 		  
         switch (gasdisplayer)
         {
@@ -244,7 +236,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             break;
           case 6:
@@ -254,7 +246,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
 
             break;
@@ -265,7 +257,7 @@ void lcd_Menu_Display_Task(void *p)
                 gfprintf( COM2, "%c%c%02d.%02d DKK/L     ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
             else{
-                gfprintf( COM2, "%c%c%02d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
+                gfprintf( COM2, "%c%c%01d.%02d DKK/L      ", 0x1B, 0xC0, myarr[0], myarr[1]);
             }
 
             break;
@@ -274,7 +266,7 @@ void lcd_Menu_Display_Task(void *p)
 
       case FUELING:
 		    gfprintf( COM2, "%c%cREMOVE NOZZLE   ", 0x1B, 0x80);
-            gfprintf( COM2, "%c%cFuel ThatBitch %01d", 0x1B, 0xC0, get_button_id());
+            gfprintf( COM2, "%c%cTo Begin       %01d", 0x1B, 0xC0, get_button_id());
         
         //Buffer bars
         break;
@@ -288,10 +280,10 @@ void lcd_Menu_Display_Task(void *p)
 			gfprintf( COM2, "%c%cDKK: %03d.%02d     ", 0x1B, 0xC0, myarr[0], myarr[1]);
 			break;
 
-      case REFUELING_DONE:
+      case REFUELING_DONE: // This state ended up not being used
         //Buffer Gas typedef
         //Buffer total price
-        gfprintf( COM2, "%c%cFUCK OFF THEN   ", 0x1B, 0x80);
+        gfprintf( COM2, "%c%c                ", 0x1B, 0x80);
         gfprintf( COM2, "%c%c                ", 0x1B, 0xC0);
         break;
     }
