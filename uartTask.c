@@ -117,7 +117,7 @@ void uart_tx_Task(void *p)
         }
         else
         {
-            vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1 ) );
+            //vTaskDelayUntil( &myLastUnblock , pdMS_TO_TICKS ( 1 ) );
             //vTaskDelay(5);
         }
     }

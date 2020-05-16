@@ -19,7 +19,12 @@ unsigned char ch;
 {
   if( *fp < 0x20000000 )           // It is a file
   {
+    if(*fp == COM1)
+    {
+		vTaskDelay(10);
+	}
     put_file( *fp, ch );
+
     //put_queue( Q_LCD, ch, 1 );
   }
   else                            // It is a pointer to a string
@@ -148,6 +153,8 @@ int  Size;
 
 const void gprint( FILE *fp, const char *Str, va_list vaArgP ) //...)
 {
+
+
   void *pParam;
   long Val;
   int i, Done, Size, Len, Sign, Adjust;
@@ -272,7 +279,7 @@ const void gprint( FILE *fp, const char *Str, va_list vaArgP ) //...)
 
 const void gfprintf( FILE fp, const char *Str, ...)
 {
-  va_list vaArgP;
+  va_list vaArgP; // From standard c library, variable array list.
 
   va_start(vaArgP, Str);
   gprint( &fp, Str, vaArgP );

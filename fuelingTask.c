@@ -316,7 +316,7 @@ void fueling_Task(void* p)
 			thisLog.quantity = fuelingAttr[1];
 			if (peekPurch.card_or_cash == S_CASH)
 			{
-				thisLog.carNr_Or_Cash = fuelingAttr[0];
+				//thisLog.carNr_Or_Cash = fuelingAttr[0];
 			}
 			else
 			{

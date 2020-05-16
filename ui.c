@@ -31,6 +31,17 @@ INT8U counter_square;
 
 
 /*****************************   Functions   *******************************/
+//BOOLEAN sendString(char *myString, char *myVar)
+//{
+//    for (int i = 0; i < strlen(myString); ++i)
+//    {
+//        if(myString[i], )
+//        put_file(COM1, myString[i]);
+//        vTaskDelay(10);
+//
+//    }
+//        
+//}
 
 BOOLEAN get_star_key()
 /*****************************************************************************
@@ -109,59 +120,54 @@ void ui_Task(void* p)
             {
                 InBuf[i++] = ch;                                              // puts char in the buffer InBuf
                 put_file(COM1, ch);                                           // puts the char back to uart so we can see what we type in the terminal
-
                 if (ch == '\r')                                               // if the current char is 'Enter' then...
                 {
 					if (InBuf[0] == '1')
                     {
-						gfprintf(COM1, "\n To set the time press 2 followed by hhmmss, then enter\n\r");
-                        char a= 0;
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS ( 100 ) );
-						gfprintf(COM1, "%cTime Example: 2125630 is 12:56:30 \n\r", a);
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
-						gfprintf(COM1, "\n To set fuel prices press 3 followed by:\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
-						gfprintf(COM1, " 1 For LeadFree92   followed by the price\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
+
+                        gfprintf(COM1, "\n To set the time press 2 followed by hhmmss, then enter\n\r");
+						gfprintf(COM1, "%cTime Example: 2125630 is 12:56:30 \n\r");
+                        gfprintf(COM1, "\n To set fuel prices press 3 followed by:\n\r");
+                        gfprintf(COM1, " 1 For LeadFree92   followed by the price\n\r");
 						gfprintf(COM1, " 2 For LeadFree95   followed by the price\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
 						gfprintf(COM1, " 3 For Diesel       followed by the price\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
 						gfprintf(COM1, "Gas Example: 320982 is 09.82 DKK \n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
+
 						gfprintf(COM1, "\n Get a Query report of total sales of gasoline sorted by product,\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
+
 						gfprintf(COM1, "\n the sum of all cash purchases, sum of all card purchases, and\n\r");
-                        vTaskDelayUntil(&myLastUnblock, pdMS_TO_TICKS(100));
+
 						gfprintf(COM1, "\n the total operating time of the pump, by writing 4 followed by enter\n");
 					}
-     //               else if (InBuf[0] == '2' && i >= 7)
-     //               {
+                    else if (InBuf[0] == '2' && i >= 7)
+                    {
 
-     //                   INT8U hour = (InBuf[1] - '0') * 10 + InBuf[2] - '0';
-     //                   INT8U min = (InBuf[3] - '0') * 10 + InBuf[4] - '0';
-     //                   INT8U sec = (InBuf[5] - '0') * 10 + InBuf[6] - '0';
-     //                   if ((hour > 23) || (min > 59) || (sec > 59)) // Check if the clock values are valid
-     //                   {
-     //                       gfprintf(COM1, "\nPlease enter a valid time hour minute sec aka 235959\n");
-     //                   }
-     //              
-     //                   else
-     //                   {
-     //                       
-     //                       struct time_day day;
-     //                       day.hours = hour;
-     //                       day.seconds = sec;
-     //                       day.minutes = min;
-     //                       xQueueOverwrite(Q_CLOCK, &day);
-     //                       xQueuePeek(Q_CLOCK, &day, 0);
-     //                       gfprintf(COM1, "\nTime of day set to %02d:%02d:%02d\n", day.hours, day.minutes, day.seconds);
-     //                   }
-     //                   
-     //                   //gfprintf( COM2, "%c%cREMOVE NOZZLE   ", 0x1B, 0x80);
-					//	//gfprintf( COM2, "%c%cFuel ThatBitch %01d", 0x1B, 0xC0, get_button_id());
-     //                   
-     //               }
+                        INT8U hour = (InBuf[1] - '0') * 10 + InBuf[2] - '0';
+                        INT8U min = (InBuf[3] - '0') * 10 + InBuf[4] - '0';
+                        INT8U sec = (InBuf[5] - '0') * 10 + InBuf[6] - '0';
+                        if ((hour > 23) || (min > 59) || (sec > 59)) // Check if the clock values are valid
+                        {
+                            gfprintf(COM1, "\nPlease enter a valid time hour minute sec aka 235959\n");
+                        }
+                   
+                        else
+                        {
+                            gfprintf(COM1, "\nPlease enter the dungeon\n");
+                            struct time_day day;
+                            day.hours = hour;
+                            day.seconds = sec;
+                            day.minutes = min;
+                            INT8U lol = 8;
+                            gfprintf(COM1, "\nTime of day set to %d\n", lol);
+                            //xQueueOverwrite(Q_CLOCK, &day);
+                            //xQueuePeek(Q_CLOCK, &day, 10);
+                            //gfprintf(COM1, "\nTime of day set to %02d:%02d:%02d\n", day.hours, day.minutes, day.seconds);
+                        }
+                        
+                        //gfprintf( COM2, "%c%cREMOVE NOZZLE   ", 0x1B, 0x80);
+						//gfprintf( COM2, "%c%cFuel ThatBitch %01d", 0x1B, 0xC0, get_button_id());
+                        
+                    }
      //               else if(InBuf[0] == '3' && i >= 5)
      //               {
      //                   struct gas_price currentPrice;

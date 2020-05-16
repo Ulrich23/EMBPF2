@@ -22,12 +22,12 @@
 
 /***************************** Include files *******************************/
 #include <stdint.h>
+#include<stdarg.h>
 #include "tm4c123gh6pm.h"
 #include "emp_type.h"
 #include "gpio.h"
 #include "string.h"
 #include "file.h"
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
