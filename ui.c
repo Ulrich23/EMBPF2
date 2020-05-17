@@ -179,6 +179,7 @@ void ui_Task(void* p)
                     else if(InBuf[0] == '3' && i >= 5) // Set price on gas
                     {
                         struct gas_price currentPrice;
+                        xQueuePeek(Q_GASPRICES, &currentPrice, 0);
                         if (InBuf[1] == '1')
                         {
                             FP32 LF92price = (((InBuf[2] - '0') * 1000.0f + (InBuf[3] - '0') * 100.0f + (InBuf[4] - '0') * 10.0f + (InBuf[5] - '0')) / 100.0f);
@@ -269,20 +270,20 @@ void ui_Task(void* p)
                             
 
                         }
-                        gfprintf(COM1, "\nTotal card purchases %d and Total cash purchases %d\n\r", countCardPay, countCashPay);
+                        gfprintf(COM1, "\nTotal card purchases %04d and Total cash purchases %04d\n\r", countCardPay, countCashPay);
 
                         bcd(soldLD92, myarr);
-                        gfprintf(COM1, "\nTotal income from Lead Free 92: %d.%02d DKK\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Lead Free 92: %06d.%02d DKK\r", myarr[0], myarr[1]);
                         bcd(soldLD95, myarr);
-                        gfprintf(COM1, "\nTotal income from Lead Free 95: %d.%02d DKK\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Lead Free 95: %06d.%02d DKK\r", myarr[0], myarr[1]);
                         bcd(soldDI, myarr);
-                        gfprintf(COM1, "\nTotal income from Diesel: %d.%02d DKK\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from Diesel: %06d.%02d DKK\r", myarr[0], myarr[1]);
 
                         FP32 total_sales = soldLD92 + soldLD95 + soldDI;
                         bcd(total_sales, myarr);
-                        gfprintf(COM1, "\nTotal income from all gas types: %d.%02d DKK\r", myarr[0], myarr[1]);
+                        gfprintf(COM1, "\nTotal income from all gas types: %07d.%02d DKK\r", myarr[0], myarr[1]);
 
-                        gfprintf(COM1, "\nTotal operating time of pump %d sec\n\r", pump_operating_time);
+                        gfprintf(COM1, "\nTotal operating time of pump %06d sec\n\r", pump_operating_time);
 
                     }
                    
